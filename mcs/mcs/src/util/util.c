@@ -53,7 +53,6 @@ struct map_field_t* map_get_field_by_key(map* pmap, char* key)
 			return &pmap->fields[i];
 		}
 	}
-	asse
 }
 
 void map_set_raw(map_t pmap, char* key, void* value)
