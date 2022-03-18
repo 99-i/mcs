@@ -1,10 +1,12 @@
 #pragma once
 #include <stdint.h>
 #include "util.h"
+
+
 struct packet_metadata_t
 {
-	uint32_t packet_id;
-	uint32_t length;
+	uint8_t packet_id;
+	uint16_t length;
 };
 
 enum estate
@@ -54,18 +56,34 @@ enum econdition
 	CONDITION_EQUALS
 };
 
+enum epacket_direction
+{
+	SERVERBOUND,
+	CLIENTBOUND
+};
+struct position_t
+{
+	int32_t x;
+	int16_t y;
+	int32_t z;
+};
+struct uuid_t
+{
+	uint64_t high;
+	uint64_t low;
+};
 
 struct slab_t
 {
-	char* name;
+	char *name;
 	uint32_t id;
 	enum estate state;
-
+	enum epacket_direction direction;
 	uint32_t num_fields;
 	struct field_t
 	{
-		char* field_name;
-		struct field_t
+		char *field_name;
+		struct field_info_t
 		{
 			enum efield_type type;
 
@@ -80,14 +98,14 @@ struct slab_t
 					{
 						struct
 						{
-							char* field_one;
-							char* field_two;
+							char *field_one;
+							char *field_two;
 						} equals;
 					} comparison;
 				} condition;
 				struct array_t
 				{
-					char* size_field;
+					char *size_field;
 					enum efield_type type_of_size_field;
 					enum efield_type type_of_elements;
 				} array;
@@ -96,11 +114,17 @@ struct slab_t
 	}*fields;
 };
 
-struct packet_metadata_t get_packet_metadata(uint32_t data_length, uint8_t* data);
+struct packet_metadata_t get_packet_metadata(uint32_t data_length, uint8_t *data);
 
 struct packet_t
 {
-	char* type;
-
+	char *type;
+	map_t map;
 };
+
+void construct_slabs(void);
+
+
+bool create_packet(uint32_t data_size, uint8_t *data, enum estate state, struct packet_t *packet);
+
 

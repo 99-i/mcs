@@ -6,6 +6,8 @@
 
 int main()
 {
+	construct_slabs();
+
 	init_game_loop();
 	init_main_loop();
 	init_network_loop();

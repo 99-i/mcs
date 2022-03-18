@@ -19,15 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="mcs\src\cjson\cjson.c" />
     <ClCompile Include="mcs\src\game.c" />
     <ClCompile Include="mcs\src\loop.c" />
     <ClCompile Include="mcs\src\main.c" />
     <ClCompile Include="mcs\src\mc_packets\mc_packets.c" />
-    <ClCompile Include="mcs\src\mc_packets\slabs.c" />
     <ClCompile Include="mcs\src\server.c" />
     <ClCompile Include="mcs\src\util\util.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="mcs\include\cjson.h" />
     <ClInclude Include="mcs\include\mcs.h" />
     <ClInclude Include="mcs\include\mc_packets.h" />
     <ClInclude Include="mcs\include\message.h" />

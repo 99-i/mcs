@@ -30,6 +30,12 @@
     <ClCompile Include="mcs\src\mc_packets\mc_packets.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="mcs\src\util\util.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mcs\src\cjson\cjson.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mcs\include\mcs.h">
@@ -39,6 +45,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="mcs\include\mc_packets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mcs\include\util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mcs\include\cjson.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
