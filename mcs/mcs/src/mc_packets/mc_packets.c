@@ -22,7 +22,6 @@ struct uuid_t the_uuid; \
 char *the_string_16; \
 bool the_boolean; \
 double the_double; \
-int16_t the_angle; \
 int32_t the_int; \
 int16_t the_short; \
 struct position_t the_position; \
@@ -89,7 +88,6 @@ READ_SIGNATURE(char *, string_16);
 READ_SIGNATURE(char *, identifier);
 READ_SIGNATURE(bool, boolean);
 READ_SIGNATURE(double, double);
-READ_SIGNATURE(int16_t, angle);
 READ_SIGNATURE(int32_t, int);
 READ_SIGNATURE(int16_t, short);
 READ_SIGNATURE(struct position_t, position);
@@ -305,6 +303,10 @@ enum efield_type field_str_to_field_type(char *str)
 	{
 		return FT_VARLONG;
 	}
+	else if (!strcmp(str, "VarInt Enum"))
+	{
+		return FT_VARINT;
+	}
 	assert(false && "unreachable");
 }
 
@@ -355,55 +357,55 @@ bool create_packet(uint32_t data_size, uint8_t *data, enum estate state, struct 
 						PACKET_READ_OPERATION(boolean, boolean);
 						break;
 					case FT_DOUBLE:
-
+						PACKET_READ_OPERATION(double, double);
 						break;
 					case FT_ANGLE:
-
+						PACKET_READ_OPERATION(unsigned_byte, uint8);
 						break;
 					case FT_INT:
-
+						PACKET_READ_OPERATION(int, int32);
 						break;
 					case FT_SHORT:
-
+						PACKET_READ_OPERATION(short, short);
 						break;
 					case FT_POSITION:
-
+						PACKET_READ_OPERATION(position, position);
 						break;
 					case FT_BYTE:
-
+						PACKET_READ_OPERATION(byte, uint8);
 						break;
 					case FT_FLOAT:
-
+						PACKET_READ_OPERATION(float, float);
 						break;
 					case FT_STRING_16:
-
+						PACKET_READ_OPERATION(string_16, string);
 						break;
 					case FT_STRING_20:
-
+						PACKET_READ_OPERATION(string_20, string);
 						break;
 					case FT_STRING_40:
-
+						PACKET_READ_OPERATION(string_40, string);
 						break;
 					case FT_STRING_255:
-
+						PACKET_READ_OPERATION(string_255, string);
 						break;
 					case FT_STRING_256:
-
+						PACKET_READ_OPERATION(string_256, string);
 						break;
 					case FT_STRING_384:
-
+						PACKET_READ_OPERATION(string_384, string);
 						break;
 					case FT_STRING_32500:
-
+						PACKET_READ_OPERATION(string_32500, string);
 						break;
 					case FT_STRING_32767:
-
+						PACKET_READ_OPERATION(string_32767, string);
 						break;
 					case FT_STRING:
-
+						PACKET_READ_OPERATION(string, string);
 						break;
 					case FT_VARLONG:
-
+						PACKET_READ_OPERATION(varlong, int64);
 						break;
 					default:
 						break;
@@ -491,13 +493,25 @@ READ_SIGNATURE(bool, boolean)
 }
 READ_SIGNATURE(double, double)
 {
-}
-READ_SIGNATURE(int16_t, angle)
-{
+	uint64_t holder;
+	if (max < 8)
+	{
+		return 0;
+	}
+	read_unsigned_long(data, max, &holder);
 
+	*dest = *(double *)&holder;
+	return 8;
 }
 READ_SIGNATURE(int32_t, int)
 {
+	if (max < 4)
+	{
+		return 0;
+	}
+	*dest = 0;
+	*dest = (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | data[0];
+	return 4;
 }
 READ_SIGNATURE(int16_t, short)
 {
@@ -549,6 +563,7 @@ READ_SIGNATURE(int8_t, byte)
 }
 READ_SIGNATURE(float, float)
 {
+
 }
 READ_STR_FUNCTION(40)
 READ_STR_FUNCTION(256)
@@ -556,6 +571,8 @@ READ_STR_FUNCTION(32500)
 READ_SIGNATURE(char *, string)
 READ_STR_BODY(32767)
 READ_STR_FUNCTION(384)
+READ_SIGNATURE(char *, identifier)
+READ_STR_BODY(32767)
 READ_STR_FUNCTION(16)
 READ_STR_FUNCTION(20)
 READ_STR_FUNCTION(32767)

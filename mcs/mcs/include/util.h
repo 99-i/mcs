@@ -14,24 +14,43 @@ void map_free(map_t pmap);
 
 
 MAP_SET_SIGNATURE(void *, raw);
-MAP_SET_SIGNATURE(uint32_t, uint32);
-MAP_SET_SIGNATURE(uint64_t, uint64);
-MAP_SET_SIGNATURE(int64_t, int64);
-MAP_SET_SIGNATURE(uint8_t, uint8);
-MAP_SET_SIGNATURE(uint16_t, uint16);
-MAP_SET_SIGNATURE(int32_t, int32);
-MAP_SET_SIGNATURE(char *, string);
-MAP_SET_SIGNATURE(struct uuid_t, uuid);
-MAP_SET_SIGNATURE(bool, boolean);
-
-
 MAP_GET_SIGNATURE(void *, raw);
+
+MAP_SET_SIGNATURE(uint32_t, uint32);
 MAP_GET_SIGNATURE(uint32_t, uint32);
+
+MAP_SET_SIGNATURE(uint64_t, uint64);
 MAP_GET_SIGNATURE(uint64_t, uint64);
+
+MAP_SET_SIGNATURE(int64_t, int64);
 MAP_GET_SIGNATURE(int64_t, int64);
+
+MAP_SET_SIGNATURE(uint8_t, uint8);
 MAP_GET_SIGNATURE(uint8_t, uint8);
+
+MAP_SET_SIGNATURE(uint16_t, uint16);
 MAP_GET_SIGNATURE(uint16_t, uint16);
+
+MAP_SET_SIGNATURE(int32_t, int32);
 MAP_GET_SIGNATURE(int32_t, int32);
+
+MAP_SET_SIGNATURE(char *, string);
 MAP_GET_SIGNATURE(char *, string);
+
+MAP_SET_SIGNATURE(struct uuid_t, uuid);
 MAP_GET_SIGNATURE(struct uuid_t, uuid);
+
+MAP_SET_SIGNATURE(struct position_t, position);
+MAP_GET_SIGNATURE(struct position_t, position);
+
+MAP_SET_SIGNATURE(bool, boolean);
 MAP_GET_SIGNATURE(bool, boolean);
+
+MAP_SET_SIGNATURE(double, double);
+MAP_SET_SIGNATURE(double, double);
+
+MAP_SET_SIGNATURE(float, float);
+MAP_SET_SIGNATURE(float, float);
+
+MAP_SET_SIGNATURE(int16_t, short);
+MAP_GET_SIGNATURE(int16_t, short);

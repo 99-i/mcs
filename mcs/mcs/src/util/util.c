@@ -161,6 +161,37 @@ MAP_REFERENCE_GET_FUNCTION(int64_t, int64)
 MAP_REFERENCE_SET_FUNCTION(struct uuid_t, uuid)
 MAP_REFERENCE_GET_FUNCTION(struct uuid_t, uuid)
 
+MAP_REFERENCE_SET_FUNCTION(struct position_t, position)
+MAP_REFERENCE_GET_FUNCTION(struct position_t, position)
+
+MAP_REFERENCE_SET_FUNCTION(double, double)
+MAP_REFERENCE_GET_FUNCTION(double, double)
+
+MAP_VALUE_SET_FUNCTION(bool, boolean);
+MAP_VALUE_GET_FUNCTION(bool, boolean);
+
+MAP_VALUE_SET_FUNCTION(int16_t, short);
+MAP_VALUE_GET_FUNCTION(int16_t, short);
+
+void map_set_float(map_t pmap, char *key, float flt)
+{
+	map_get_field_by_key(pmap, key)->data = *(int32_t *)&flt;
+}
+
+bool map_get_float(map_t pmap, char *key, float *dest)
+{
+	if (map_has_field(pmap, key))
+	{
+		*dest = *(float *)map_get_field_by_key(pmap, key);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+
 void map_set_string(map_t pmap, char *key, char *string)
 {
 	map_get_field_by_key(pmap, key)->data = _strdup(string);
