@@ -125,6 +125,6 @@ struct packet_t
 void construct_slabs(void);
 
 
-bool create_packet(uint32_t data_size, uint8_t *data, enum estate state, struct packet_t *packet);
+bool create_serverbound_packet(uint32_t data_size, uint8_t *data, enum estate state, struct packet_t *packet);
 
 

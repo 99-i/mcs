@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdbool.h>
-
+#include <inttypes.h>
 #define CHECKRESULT do { \
 	if(result) \
 	{ \
@@ -55,13 +55,34 @@ static void allocate_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t
 
 static void read_stream(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
-	int i;
-
+	bool res;
+	int32_t protocol_version;
+	char *address;
+	uint16_t port;
+	int32_t next_state;
 	struct packet_metadata_t metadata = get_packet_metadata(nread, (uint8_t *)buf->base);
 
 	struct packet_t packet;
 
-	create_packet(nread, (uint8_t *)buf->base, 0, &packet);
+	res = create_serverbound_packet(nread, (uint8_t *)buf->base, 0, &packet);
+
+
+	if (res)
+	{
+		map_get_int32(packet.map, "Protocol Version", &protocol_version);
+		map_get_string(packet.map, "Server Address", &address);
+		map_get_uint16(packet.map, "Server Port", &port);
+		map_get_int32(packet.map, "Next State", &next_state);
+
+		if (!strcmp(packet.type, "Handshake"))
+		{
+			printf("PROTOCOL VERSION: %" PRId32 "\n", protocol_version);
+			printf("SERVER ADDRESS: %s" "\n", address);
+			printf("SERVER PORT: %" PRIu16 "\n", port);
+			printf("NEXT STATE: %" PRId32 "\n", next_state);
+		}
+	}
+
 }
 
 
