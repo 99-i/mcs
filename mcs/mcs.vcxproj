@@ -106,8 +106,8 @@
       <ConformanceMode>true</ConformanceMode>
       <CompileAs>CompileAsC</CompileAs>
       <AdditionalIncludeDirectories>C:\sdks\libuv\include;$(ProjectDir)mcs\include</AdditionalIncludeDirectories>
-      <PreprocessToFile>true</PreprocessToFile>
-      <PreprocessSuppressLineNumbers>true</PreprocessSuppressLineNumbers>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,8 +130,8 @@
       <ConformanceMode>true</ConformanceMode>
       <CompileAs>CompileAsC</CompileAs>
       <AdditionalIncludeDirectories>C:\sdks\libuv\include;$(ProjectDir)mcs\include</AdditionalIncludeDirectories>
-      <PreprocessToFile>true</PreprocessToFile>
-      <PreprocessSuppressLineNumbers>true</PreprocessSuppressLineNumbers>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -154,8 +154,8 @@
       <ConformanceMode>true</ConformanceMode>
       <CompileAs>CompileAsC</CompileAs>
       <AdditionalIncludeDirectories>C:\sdks\libuv\include;$(ProjectDir)mcs\include</AdditionalIncludeDirectories>
-      <PreprocessToFile>true</PreprocessToFile>
-      <PreprocessSuppressLineNumbers>true</PreprocessSuppressLineNumbers>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -178,8 +178,8 @@
       <ConformanceMode>true</ConformanceMode>
       <CompileAs>CompileAsC</CompileAs>
       <AdditionalIncludeDirectories>C:\sdks\libuv\include;$(ProjectDir)mcs\include</AdditionalIncludeDirectories>
-      <PreprocessToFile>true</PreprocessToFile>
-      <PreprocessSuppressLineNumbers>true</PreprocessSuppressLineNumbers>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

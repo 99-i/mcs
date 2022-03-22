@@ -9,7 +9,6 @@ enum emessage
 	MESSAGE_GI_SEND_PACKET, MESSAGE_GI_CLOSE_CLIENT,
 	MESSAGE_GO_NEW_CLIENT, MESSAGE_GO_PACKET
 };
-struct client_t;
 struct message_t
 {
 	enum emessage type;

@@ -220,14 +220,16 @@ bool map_get_int32(map_t pmap, str key, int32_t *dest)
 
 void map_set_uint64(map_t pmap, str key, uint64_t value)
 {
-	uint64_t *ptr = malloc(sizeof(uint64_t)); *ptr = value; map_get_field_by_key(pmap, key)->data = ptr; map *clearmap = (map *)pmap; clearmap->num_referenced_fields += 1; if (clearmap->num_referenced_fields == 1)
+	uint64_t *ptr = malloc(sizeof(uint64_t)); *ptr = value; map_get_field_by_key(pmap, key)->data = ptr; map *clearmap = (map *)pmap; clearmap->num_referenced_fields += 1;
+	if (clearmap->num_referenced_fields == 1)
 	{
 		clearmap->referenced_fields = malloc(clearmap->num_referenced_fields * sizeof(str));
 	}
 	else
 	{
 		clearmap->referenced_fields = realloc(clearmap->referenced_fields, clearmap->num_referenced_fields * sizeof(str));
-	} clearmap->referenced_fields[clearmap->num_referenced_fields - 1] = _strdup(key);
+	}
+	clearmap->referenced_fields[clearmap->num_referenced_fields - 1] = _strdup(key);
 }
 bool map_get_uint64(map_t pmap, str key, uint64_t *dest)
 {
@@ -385,7 +387,10 @@ bool map_get_float(map_t pmap, char *key, float *dest)
 
 void map_set_string(map_t pmap, char *key, char *string)
 {
-	map_get_field_by_key(pmap, key)->data = _strdup(string);
+	if (string != 0)
+	{
+		map_get_field_by_key(pmap, key)->data = _strdup(string);
+	}
 }
 
 bool map_get_string(map_t pmap, char *key, char **dest)

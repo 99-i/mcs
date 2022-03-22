@@ -9,66 +9,10 @@
 
 /* returns the amount of bytes that the varint took up. the int64_t pointed to by dest receives the value of the varint */
 #define READ_SIGNATURE(type, name) static uint8_t read_##name(uint8_t* data, uint8_t max, ##type* dest)
-#define PLACEHOLDERS int32_t the_varint; \
-char* the_string_255; \
-uint16_t the_unsigned_short; \
-uint8_t the_unsigned_byte; \
-char* the_string_32767; \
-int64_t the_long; \
-char* the_identifier; \
-char *the_chat; \
-char *the_string_20; \
-struct uuid_t the_uuid; \
-char *the_string_16; \
-bool the_boolean; \
-double the_double; \
-int32_t the_int; \
-int16_t the_short; \
-struct position_t the_position; \
-int8_t the_byte; \
-float the_float; \
-char *the_string_40; \
-char *the_string_256; \
-char *the_string_32500; \
-char *the_string; \
-int64_t the_varlong; \
-char *the_string_384
-
-
-#define PACKET_READ_OPERATION(var, mapset) data_needle += read_##var(data + data_needle, data_size - data_needle, &the_##var); \
-map_set_##mapset(packet->map, slab->fields[j].field_name, the_##var);
-
-#define READ_STR_BODY(length) { \
-	int32_t strlength; \
-	size_t i = 0; \
-	char* str; \
-	uint8_t varint_length; \
-	varint_length = read_varint(data, max, &strlength); \
-	if (strlength > length) \
-	{ \
-		return 0; \
-	} \
-	str = malloc(strlength + 1); \
-	for (; i < strlength; i++) \
-	{ \
-		if (i + varint_length > max) \
-		{ \
-			free(str); \
-			return 0; \
-		} \
-		str[i] = data[i + varint_length]; \
-	} \
-	str[strlength] = 0; \
-	*dest = _strdup(str); \
-	return i + varint_length; \
-}
-
-#define READ_STR_FUNCTION(length) READ_SIGNATURE(char*, string_##length) \
-READ_STR_BODY(##length)
 
 
 
-static struct slabinfo_t
+struct slabinfo_t
 {
 	size_t num_slabs;
 	struct slab_t *slabs;
@@ -319,7 +263,32 @@ bool create_serverbound_packet(uint32_t data_size, uint8_t *data, enum estate st
 	bool found_slab = false;
 	uint32_t data_needle = 0;
 	data_needle += read_varint(data, data_size, 0);
-	PLACEHOLDERS;
+	data_needle += read_varint(data + data_needle, data_size - data_needle, 0);
+	int32_t the_varint;
+	char *the_string_255 = 0;
+	uint16_t the_unsigned_short;
+	uint8_t the_unsigned_byte;
+	char *the_string_32767 = 0;
+	int64_t the_long;
+	char *the_identifier = 0;
+	char *the_chat = 0;
+	char *the_string_20 = 0;
+	struct uuid_t the_uuid;
+	char *the_string_16 = 0;
+	bool the_boolean;
+	double the_double;
+	int32_t the_int;
+	int16_t the_short;
+	struct position_t the_position;
+	int8_t the_byte;
+	float the_float;
+	char *the_string_40 = 0;
+	char *the_string_256 = 0;
+	char *the_string_32500 = 0;
+	char *the_string = 0;
+	int64_t the_varlong;
+	char *the_string_384 = 0;
+
 	for (i = 0; i < slabinfo.num_slabs; i++)
 	{
 		if (slabinfo.slabs[i].state == state && slabinfo.slabs[i].id == metadata.packet_id)
@@ -447,7 +416,7 @@ static uint8_t read_varint(uint8_t *data, uint8_t max, int32_t *dest)
 {
 	int32_t decoded_int = 0;
 	int32_t bit_offset = 0;
-	int8_t current_byte = 0;
+	uint8_t current_byte = 0;
 	uint8_t len = 0;
 
 	do
@@ -478,7 +447,7 @@ static uint8_t read_unsigned_short(uint8_t *data, uint8_t max, uint16_t *dest)
 		return 0;
 	}
 	*dest = 0;
-	*dest = (data[1] << 8) | data[0];
+	*dest = (data[0] << 8) | data[1];
 	return 2;
 }
 static uint8_t read_unsigned_byte(uint8_t *data, uint8_t max, uint8_t *dest)
@@ -497,7 +466,7 @@ static uint8_t read_long(uint8_t *data, uint8_t max, int64_t *dest)
 		return 0;
 	}
 	*dest = 0;
-	*dest = ((uint64_t)data[5] << 40) | ((uint64_t)data[4] << 32) | ((uint64_t)data[3] << 24) | ((uint64_t)data[2] << 16) | ((uint64_t)data[1] << 8) | data[0];
+	*dest = ((uint64_t)data[0] << 40) | ((uint64_t)data[1] << 32) | ((uint64_t)data[2] << 24) | ((uint64_t)data[3] << 16) | ((uint64_t)data[4] << 8) | data[5];
 	return 8;
 }
 static uint8_t read_chat(uint8_t *data, uint8_t max, char **dest)
@@ -515,11 +484,18 @@ static uint8_t read_chat(uint8_t *data, uint8_t max, char **dest)
 }
 static uint8_t read_uuid(uint8_t *data, uint8_t max, struct uuid_t *dest)
 {
+	uint64_t high;
+	uint64_t low;
 	if (max < 16)
 	{
 		return 0;
 	}
+	high = read_unsigned_long(data, max, &high);
+	low = read_unsigned_long(data + 8, max - 8, &low);
 
+	dest->high = high;
+	dest->low = low;
+	return 16;
 }
 static uint8_t read_boolean(uint8_t *data, uint8_t max, _Bool *dest)
 {
@@ -557,7 +533,7 @@ static uint8_t read_int(uint8_t *data, uint8_t max, int32_t *dest)
 	if (dest)
 	{
 		*dest = 0;
-		*dest = (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | data[0];
+		*dest = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
 	}
 	return 4;
 }
@@ -746,16 +722,32 @@ static uint8_t read_string_32767(uint8_t *data, uint8_t max, char **dest)
 }
 static uint8_t read_string_255(uint8_t *data, uint8_t max, char **dest)
 {
-	int32_t strlength; size_t i = 0; char *str; uint8_t varint_length; varint_length = read_varint(data, max, &strlength); if (strlength > 255)
+	int32_t strlength;
+	size_t i;
+	char *str;
+	uint8_t varint_length;
+	varint_length = read_varint(data, max, &strlength);
+	if (strlength > 255)
 	{
 		return 0;
-	} str = malloc(strlength + 1); for (; i < strlength; i++)
+	}
+	if (strlength < 1)
+	{
+		return varint_length;
+
+	}
+	str = malloc(strlength + 1);
+	for (i = 0; i < strlength; i++)
 	{
 		if (i + varint_length > max)
 		{
 			free(str); return 0;
-		} str[i] = data[i + varint_length];
-	} str[strlength] = 0; *dest = _strdup(str); return i + varint_length;
+		}
+		str[i] = data[i + varint_length];
+	}
+	str[strlength] = 0;
+	*dest = _strdup(str);
+	return i + varint_length;
 }
 static uint8_t read_varlong(uint8_t *data, uint8_t max, int64_t *dest)
 {
