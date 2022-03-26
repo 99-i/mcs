@@ -23,6 +23,7 @@
     <ClCompile Include="mcs\src\game.c" />
     <ClCompile Include="mcs\src\loop.c" />
     <ClCompile Include="mcs\src\main.c" />
+    <ClCompile Include="mcs\src\mcs.c" />
     <ClCompile Include="mcs\src\mc_packets\mc_packets.c" />
     <ClCompile Include="mcs\src\server.c" />
     <ClCompile Include="mcs\src\util\util.c" />

@@ -9,13 +9,6 @@ struct packet_metadata_t
 	uint16_t length;
 };
 
-enum estate
-{
-	STATE_HANDSHAKING,
-	STATE_STATUS,
-	STATE_LOGIN,
-	STATE_PLAY
-};
 
 
 enum efield_type

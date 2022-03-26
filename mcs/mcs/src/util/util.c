@@ -5,54 +5,8 @@
 #include <string.h>
 #include <stdio.h>
 #include "mc_packets.h"
-#define MAP_REFERENCE_GET_FUNCTION(type, name) bool map_get_##name(map_t pmap, str key, ##type* dest) \
-{ \
-if (map_has_field(pmap, key)) \
-{ \
-*dest = *((##type*)(map_get_field_by_key(pmap, key)->data)); \
-return true; \
-} \
-else \
-{ \
-return false; \
-} \
-}
 
-#define MAP_REFERENCE_SET_FUNCTION(type, name) void map_set_##name(map_t pmap, str key, ##type value) \
-{ \
-##type* ptr = malloc(sizeof(##type)); \
-*ptr = value; \
-map_get_field_by_key(pmap, key)->data = ptr; \
-map* clearmap = (map*)pmap; \
-clearmap->num_referenced_fields += 1; \
-if (clearmap->num_referenced_fields == 1) \
-{ \
-clearmap->referenced_fields = malloc(clearmap->num_referenced_fields * sizeof(str)); \
-} \
-else \
-{ \
-clearmap->referenced_fields = realloc(clearmap->referenced_fields, clearmap->num_referenced_fields * sizeof(str)); \
-} \
-clearmap->referenced_fields[clearmap->num_referenced_fields - 1] = _strdup(key); \
-}
 
-#define MAP_VALUE_SET_FUNCTION(type, name) void map_set_##name(map_t pmap, str key, ##type value) \
-{ \
-map_get_field_by_key(pmap, key)->data = value; \
-}
-
-#define MAP_VALUE_GET_FUNCTION(type, name) bool map_get_##name(map_t pmap, str key, ##type* dest) \
-{ \
-if (map_has_field(pmap, key)) \
-{ \
-	*dest = map_get_field_by_key(pmap, key)->data; \
-	return true; \
-} \
-else \
-{ \
-	return false; \
-} \
-}
 
 
 typedef struct

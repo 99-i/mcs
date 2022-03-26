@@ -2,6 +2,7 @@
 #include <uv.h>
 #include "mc_packets.h"
 
+
 enum emessage
 {
 	MESSAGE_SI_NEW_CONNECTION, MESSAGE_SI_DATA, MESSAGE_SI_CLOSE_CONNECTION,
@@ -9,11 +10,19 @@ enum emessage
 	MESSAGE_GI_SEND_PACKET, MESSAGE_GI_CLOSE_CLIENT,
 	MESSAGE_GO_NEW_CLIENT, MESSAGE_GO_PACKET
 };
+
 struct message_t
 {
 	enum emessage type;
 	void *data;
 };
+
+struct message_queue_t
+{
+	uint32_t num_messages;
+	struct message_t *messages;
+};
+
 
 typedef struct message_si_new_connection_t
 {

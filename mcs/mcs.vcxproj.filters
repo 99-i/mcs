@@ -36,6 +36,9 @@
     <ClCompile Include="mcs\src\cjson\cjson.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="mcs\src\mcs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mcs\include\mcs.h">

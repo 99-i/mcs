@@ -4,8 +4,13 @@
 #include "mc_packets.h"
 #include <stddef.h>
 
+struct game_t *game;
+uv_mutex_t lock;
 int main()
 {
+	game = malloc(sizeof(struct game_t));
+	uv_mutex_init(&lock);
+
 	construct_slabs();
 
 	init_game_loop();
@@ -23,5 +28,9 @@ int main()
 	uv_thread_join(&main_thread);
 	uv_thread_join(&game_thread);
 	uv_thread_join(&network_thread);
+
+	uv_mutex_destroy(&lock);
 	return 0;
 }
+
+

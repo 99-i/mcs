@@ -6,7 +6,8 @@
 #include <string.h>
 #include "cjson.h"
 #include <assert.h>
-
+#include "mcs.h"
+#undef uuid_t
 /* returns the amount of bytes that the varint took up. the int64_t pointed to by dest receives the value of the varint */
 #define READ_SIGNATURE(type, name) static uint8_t read_##name(uint8_t* data, uint8_t max, ##type* dest)
 
