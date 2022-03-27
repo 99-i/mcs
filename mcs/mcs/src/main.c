@@ -8,7 +8,7 @@ struct game_t *game;
 uv_mutex_t lock;
 int main()
 {
-	game = malloc(sizeof(struct game_t));
+	game = construct_game();
 	uv_mutex_init(&lock);
 
 	construct_slabs();

@@ -174,7 +174,11 @@ bool map_get_int32(map_t pmap, str key, int32_t *dest)
 
 void map_set_uint64(map_t pmap, str key, uint64_t value)
 {
-	uint64_t *ptr = malloc(sizeof(uint64_t)); *ptr = value; map_get_field_by_key(pmap, key)->data = ptr; map *clearmap = (map *)pmap; clearmap->num_referenced_fields += 1;
+	uint64_t *ptr = malloc(sizeof(uint64_t));
+	*ptr = value;
+	map_get_field_by_key(pmap, key)->data = ptr;
+	map *clearmap = (map *)pmap;
+	clearmap->num_referenced_fields += 1;
 	if (clearmap->num_referenced_fields == 1)
 	{
 		clearmap->referenced_fields = malloc(clearmap->num_referenced_fields * sizeof(str));
@@ -362,5 +366,19 @@ bool map_get_string(map_t pmap, char *key, char **dest)
 
 void map_free(map_t pmap)
 {
+	map *map = pmap;
+	size_t i;
+
+	for (i = 0; i < map->num_referenced_fields; i++)
+	{
+		free(map_get_field_by_key(pmap, map->referenced_fields[i])->data);
+		free(map->referenced_fields[i]);
+	}
+
+	for (i = 0; i < map->num_fields; i++)
+	{
+		free(map->fields[i].name);
+	}
+
 	free(pmap);
 }

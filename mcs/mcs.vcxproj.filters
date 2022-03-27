@@ -44,9 +44,6 @@
     <ClInclude Include="mcs\include\mcs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mcs\include\message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="mcs\include\mc_packets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -54,6 +51,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="mcs\include\cjson.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mcs\include\game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

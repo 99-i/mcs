@@ -53,21 +53,58 @@ static void allocate_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t
 	buf->len = suggested_size;
 }
 
-
-static void read_stream(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
+static void handle_read(uv_stream_t *stream, uint32_t size, uint8_t *data)
 {
 	bool res;
 	int32_t protocol_version;
 	char *address;
 	uint16_t port;
 	int32_t next_state;
-	struct packet_metadata_t metadata = get_packet_metadata(nread, (uint8_t *)buf->base);
+	struct client_t *client;
+	struct wraparound_t wraparound;
+
+	struct packet_metadata_t metadata = get_packet_metadata(size, data);
+
+	if (should_wraparound(data, size, &wraparound))
+	{
+		handle_read(stream, wraparound.first_size, data);
+		handle_read(stream, wraparound.second_size, data + wraparound.cutoff);
+		return;
+	}
+
+	if (0 == (client = game_get_client(stream)))
+	{
+		client = game_init_client(stream);
+	}
+
 
 	struct packet_t packet;
 
-	res = create_serverbound_packet(nread, (uint8_t *)buf->base, 0, &packet);
+	res = create_serverbound_packet(size, data, client->state, &packet);
 
+	if (res)
+	{
+		game_handle_client_packet(client, &packet);
+	}
+}
 
+static void read_stream(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
+{
+	if (nread < 0)
+	{
+		if (nread == UV_EOF)
+		{
+			game_handle_client_disconnect(stream);
+		}
+	}
+	else
+	{
+		handle_read(stream, nread, (uint8_t *)buf->base);
+		if (buf->base)
+		{
+			free(buf->base);
+		}
+	}
 }
 
 

@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include <uv.h>
-#include "message.h"
+#include "game.h"
 
 extern uv_mutex_t lock;
 struct world_t;
@@ -53,7 +53,6 @@ struct game_t
 	uint32_t tick_count;
 };
 
-struct game_t *construct_game(void);
 
 
 extern uv_loop_t main_loop;
@@ -61,12 +60,6 @@ extern uv_loop_t game_loop;
 extern uv_loop_t network_loop;
 
 extern struct game_t *game;
-
-void init_game_loop(void);
-void run_game_loop(void *data);
-
-struct client_t *game_init_client(uv_tcp_t *socket);
-
 
 void init_main_loop(void);
 void run_main_loop(void *data);

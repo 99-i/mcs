@@ -8,16 +8,13 @@
 #include <assert.h>
 #include "mcs.h"
 #undef uuid_t
-/* returns the amount of bytes that the varint took up. the int64_t pointed to by dest receives the value of the varint */
-#define READ_SIGNATURE(type, name) static uint8_t read_##name(uint8_t* data, uint8_t max, ##type* dest)
-
-
 
 struct slabinfo_t
 {
 	size_t num_slabs;
 	struct slab_t *slabs;
-} slabinfo;
+}
+slabinfo;
 
 static uint8_t read_varint(uint8_t *data, uint8_t max, int32_t *dest);
 static uint8_t read_string_255(uint8_t *data, uint8_t max, char **dest);
@@ -77,7 +74,6 @@ void construct_slabs(void)
 	char *packet_state;
 	size_t i;
 
-
 	slurp_file_to_cstr("slabs.json", &jsonstr);
 	all = cJSON_Parse(jsonstr);
 	num_slabs = cJSON_GetArraySize(all);
@@ -105,9 +101,7 @@ void construct_slabs(void)
 		{
 			slabinfo.slabs[slab_index].fields[i].field_name = _strdup(cJSON_GetObjectItem(cJSON_GetArrayItem(fields, i), "fieldName")->valuestring);
 			slabinfo.slabs[slab_index].fields[i].fieldinfo.type = field_str_to_field_type(cJSON_GetObjectItem(cJSON_GetArrayItem(fields, i), "fieldType")->valuestring);
-
 		}
-
 
 		slab_index++;
 	} while (current_slab = current_slab->next);
@@ -255,6 +249,22 @@ enum efield_type field_str_to_field_type(char *str)
 	assert(false && "unreachable");
 }
 
+bool should_wraparound(uint8_t *data, uint32_t data_size, struct wraparound_t *cutoff)
+{
+	int32_t length;
+	uint8_t length_size;
+	length_size = read_varint(data, data_size, &length);
+
+	if (data_size - length_size > length)
+	{
+		cutoff->cutoff = length_size + length;
+		cutoff->first_size = length_size + length;
+		cutoff->second_size = data_size - (length_size + length);
+		return true;
+	}
+
+	return false;
+}
 
 bool create_serverbound_packet(uint32_t data_size, uint8_t *data, enum estate state, struct packet_t *packet)
 {
@@ -292,12 +302,14 @@ bool create_serverbound_packet(uint32_t data_size, uint8_t *data, enum estate st
 
 	for (i = 0; i < slabinfo.num_slabs; i++)
 	{
-		if (slabinfo.slabs[i].state == state && slabinfo.slabs[i].id == metadata.packet_id)
+		if (slabinfo.slabs[i].state == state && slabinfo.slabs[i].id == metadata.packet_id && slabinfo.slabs[i].direction == SERVERBOUND)
 		{
 			found_slab = true;
-			packet->type = _strdup(slabinfo.slabs[i].name);
-			packet->map = construct_map();
 			struct slab_t *slab = &slabinfo.slabs[i];
+			packet->type = _strdup(slab->name);
+			packet->map = construct_map();
+			packet->direction = SERVERBOUND;
+
 			for (j = 0; j < slab->num_fields; j++)
 			{
 				switch (slab->fields[j].fieldinfo.type)
@@ -472,16 +484,27 @@ static uint8_t read_long(uint8_t *data, uint8_t max, int64_t *dest)
 }
 static uint8_t read_chat(uint8_t *data, uint8_t max, char **dest)
 {
-	int32_t strlength; size_t i = 0; char *str; uint8_t varint_length; varint_length = read_varint(data, max, &strlength); if (strlength > 262144)
+	int32_t strlength;
+	size_t i = 0;
+	char *str;
+	uint8_t varint_length;
+	varint_length = read_varint(data, max, &strlength);
+	if (strlength > 262144)
 	{
 		return 0;
-	} str = malloc(strlength + 1); for (; i < strlength; i++)
+	}
+	str = malloc(strlength + 1);
+	for (; i < strlength; i++)
 	{
 		if (i + varint_length > max)
 		{
-			free(str); return 0;
-		} str[i] = data[i + varint_length];
-	} str[strlength] = 0; *dest = _strdup(str); return i + varint_length;
+			free(str);
+			return 0;
+		}
+		str[i] = data[i + varint_length];
+	}
+	str[strlength] = 0; *dest = _strdup(str);
+	return i + varint_length;
 }
 static uint8_t read_uuid(uint8_t *data, uint8_t max, struct uuid_t *dest)
 {
@@ -606,120 +629,219 @@ static uint8_t read_float(uint8_t *data, uint8_t max, float *dest)
 }
 static uint8_t read_string_40(uint8_t *data, uint8_t max, char **dest)
 {
-	int32_t strlength; size_t i = 0; char *str; uint8_t varint_length; varint_length = read_varint(data, max, &strlength); if (strlength > 40)
+	int32_t strlength;
+	size_t i = 0;
+	char *str;
+	uint8_t varint_length;
+	varint_length = read_varint(data, max, &strlength);
+	if (strlength > 40)
 	{
 		return 0;
-	} str = malloc(strlength + 1); for (; i < strlength; i++)
+	}
+	str = malloc(strlength + 1);
+	for (; i < strlength; i++)
 	{
 		if (i + varint_length > max)
 		{
-			free(str); return 0;
-		} str[i] = data[i + varint_length];
-	} str[strlength] = 0; *dest = _strdup(str); return i + varint_length;
+			free(str);
+			return 0;
+		}
+		str[i] = data[i + varint_length];
+	}
+	str[strlength] = 0; *dest = _strdup(str);
+	return i + varint_length;
 }
 static uint8_t read_string_256(uint8_t *data, uint8_t max, char **dest)
 {
-	int32_t strlength; size_t i = 0; char *str; uint8_t varint_length; varint_length = read_varint(data, max, &strlength); if (strlength > 256)
+	int32_t strlength;
+	size_t i = 0;
+	char *str;
+	uint8_t varint_length;
+	varint_length = read_varint(data, max, &strlength);
+	if (strlength > 256)
 	{
 		return 0;
-	} str = malloc(strlength + 1); for (; i < strlength; i++)
+	}
+	str = malloc(strlength + 1);
+	for (; i < strlength; i++)
 	{
 		if (i + varint_length > max)
 		{
-			free(str); return 0;
-		} str[i] = data[i + varint_length];
-	} str[strlength] = 0; *dest = _strdup(str); return i + varint_length;
+			free(str);
+			return 0;
+		}
+		str[i] = data[i + varint_length];
+	}
+	str[strlength] = 0; *dest = _strdup(str);
+	return i + varint_length;
 }
 static uint8_t read_string_32500(uint8_t *data, uint8_t max, char **dest)
 {
-	int32_t strlength; size_t i = 0; char *str; uint8_t varint_length; varint_length = read_varint(data, max, &strlength); if (strlength > 32500)
+	int32_t strlength;
+	size_t i = 0;
+	char *str;
+	uint8_t varint_length;
+	varint_length = read_varint(data, max, &strlength);
+	if (strlength > 32500)
 	{
 		return 0;
-	} str = malloc(strlength + 1); for (; i < strlength; i++)
+	}
+	str = malloc(strlength + 1);
+	for (; i < strlength; i++)
 	{
 		if (i + varint_length > max)
 		{
-			free(str); return 0;
-		} str[i] = data[i + varint_length];
-	} str[strlength] = 0; *dest = _strdup(str); return i + varint_length;
+			free(str);
+			return 0;
+		}
+		str[i] = data[i + varint_length];
+	}
+	str[strlength] = 0; *dest = _strdup(str);
+	return i + varint_length;
 }
 static uint8_t read_string(uint8_t *data, uint8_t max, char **dest)
 {
-	int32_t strlength; size_t i = 0; char *str; uint8_t varint_length; varint_length = read_varint(data, max, &strlength); if (strlength > 32767)
+	int32_t strlength;
+	size_t i = 0;
+	char *str;
+	uint8_t varint_length;
+	varint_length = read_varint(data, max, &strlength);
+	if (strlength > 32767)
 	{
 		return 0;
-	} str = malloc(strlength + 1); for (; i < strlength; i++)
+	}
+	str = malloc(strlength + 1);
+	for (; i < strlength; i++)
 	{
 		if (i + varint_length > max)
 		{
-			free(str); return 0;
-		} str[i] = data[i + varint_length];
-	} str[strlength] = 0; *dest = _strdup(str); return i + varint_length;
+			free(str);
+			return 0;
+		}
+		str[i] = data[i + varint_length];
+	}
+	str[strlength] = 0; *dest = _strdup(str);
+	return i + varint_length;
 }
 static uint8_t read_string_384(uint8_t *data, uint8_t max, char **dest)
 {
-	int32_t strlength; size_t i = 0; char *str; uint8_t varint_length; varint_length = read_varint(data, max, &strlength); if (strlength > 384)
+	int32_t strlength;
+	size_t i = 0;
+	char *str;
+	uint8_t varint_length;
+	varint_length = read_varint(data, max, &strlength);
+	if (strlength > 384)
 	{
 		return 0;
-	} str = malloc(strlength + 1); for (; i < strlength; i++)
+	}
+	str = malloc(strlength + 1);
+	for (; i < strlength; i++)
 	{
 		if (i + varint_length > max)
 		{
-			free(str); return 0;
-		} str[i] = data[i + varint_length];
-	} str[strlength] = 0; *dest = _strdup(str); return i + varint_length;
+			free(str);
+			return 0;
+		}
+		str[i] = data[i + varint_length];
+	}
+	str[strlength] = 0; *dest = _strdup(str);
+	return i + varint_length;
 }
 static uint8_t read_identifier(uint8_t *data, uint8_t max, char **dest)
 {
-	int32_t strlength; size_t i = 0; char *str; uint8_t varint_length; varint_length = read_varint(data, max, &strlength); if (strlength > 32767)
+	int32_t strlength;
+	size_t i = 0;
+	char *str;
+	uint8_t varint_length;
+	varint_length = read_varint(data, max, &strlength);
+	if (strlength > 32767)
 	{
 		return 0;
-	} str = malloc(strlength + 1); for (; i < strlength; i++)
+	}
+	str = malloc(strlength + 1);
+	for (; i < strlength; i++)
 	{
 		if (i + varint_length > max)
 		{
-			free(str); return 0;
-		} str[i] = data[i + varint_length];
-	} str[strlength] = 0; *dest = _strdup(str); return i + varint_length;
+			free(str);
+			return 0;
+		}
+		str[i] = data[i + varint_length];
+	}
+	str[strlength] = 0; *dest = _strdup(str);
+	return i + varint_length;
 }
 static uint8_t read_string_16(uint8_t *data, uint8_t max, char **dest)
 {
-	int32_t strlength; size_t i = 0; char *str; uint8_t varint_length; varint_length = read_varint(data, max, &strlength); if (strlength > 16)
+	int32_t strlength;
+	size_t i = 0;
+	char *str;
+	uint8_t varint_length;
+	varint_length = read_varint(data, max, &strlength);
+	if (strlength > 16)
 	{
 		return 0;
-	} str = malloc(strlength + 1); for (; i < strlength; i++)
+	}
+	str = malloc(strlength + 1);
+	for (; i < strlength; i++)
 	{
 		if (i + varint_length > max)
 		{
-			free(str); return 0;
-		} str[i] = data[i + varint_length];
-	} str[strlength] = 0; *dest = _strdup(str); return i + varint_length;
+			free(str);
+			return 0;
+		}
+		str[i] = data[i + varint_length];
+	}
+	str[strlength] = 0; *dest = _strdup(str);
+	return i + varint_length;
 }
 static uint8_t read_string_20(uint8_t *data, uint8_t max, char **dest)
 {
-	int32_t strlength; size_t i = 0; char *str; uint8_t varint_length; varint_length = read_varint(data, max, &strlength); if (strlength > 20)
+	int32_t strlength;
+	size_t i = 0;
+	char *str;
+	uint8_t varint_length;
+	varint_length = read_varint(data, max, &strlength);
+	if (strlength > 20)
 	{
 		return 0;
-	} str = malloc(strlength + 1); for (; i < strlength; i++)
+	}
+	str = malloc(strlength + 1);
+	for (; i < strlength; i++)
 	{
 		if (i + varint_length > max)
 		{
-			free(str); return 0;
-		} str[i] = data[i + varint_length];
-	} str[strlength] = 0; *dest = _strdup(str); return i + varint_length;
+			free(str);
+			return 0;
+		}
+		str[i] = data[i + varint_length];
+	}
+	str[strlength] = 0; *dest = _strdup(str);
+	return i + varint_length;
 }
 static uint8_t read_string_32767(uint8_t *data, uint8_t max, char **dest)
 {
-	int32_t strlength; size_t i = 0; char *str; uint8_t varint_length; varint_length = read_varint(data, max, &strlength); if (strlength > 32767)
+	int32_t strlength;
+	size_t i = 0;
+	char *str;
+	uint8_t varint_length;
+	varint_length = read_varint(data, max, &strlength);
+	if (strlength > 32767)
 	{
 		return 0;
-	} str = malloc(strlength + 1); for (; i < strlength; i++)
+	}
+	str = malloc(strlength + 1);
+	for (; i < strlength; i++)
 	{
 		if (i + varint_length > max)
 		{
-			free(str); return 0;
-		} str[i] = data[i + varint_length];
-	} str[strlength] = 0; *dest = _strdup(str); return i + varint_length;
+			free(str);
+			return 0;
+		}
+		str[i] = data[i + varint_length];
+	}
+	str[strlength] = 0; *dest = _strdup(str);
+	return i + varint_length;
 }
 static uint8_t read_string_255(uint8_t *data, uint8_t max, char **dest)
 {
@@ -742,7 +864,8 @@ static uint8_t read_string_255(uint8_t *data, uint8_t max, char **dest)
 	{
 		if (i + varint_length > max)
 		{
-			free(str); return 0;
+			free(str);
+			return 0;
 		}
 		str[i] = data[i + varint_length];
 	}
@@ -777,4 +900,11 @@ static uint8_t read_varlong(uint8_t *data, uint8_t max, int64_t *dest)
 		*dest = decoded_long;
 	}
 	return len;
+}
+
+
+bool write_packet_response(struct packet_t *packet, char *json_response)
+{
+	packet->type = _strdup("Response");
+	packet->direction = CLIENTBOUND;
 }
