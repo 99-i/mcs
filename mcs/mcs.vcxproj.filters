@@ -56,5 +56,8 @@
     <ClInclude Include="mcs\include\game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="mcs\include\server.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

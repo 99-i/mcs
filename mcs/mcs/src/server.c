@@ -114,3 +114,13 @@ void run_network_loop(void *data)
 {
 	uv_run(&network_loop, UV_RUN_DEFAULT);
 }
+
+
+
+void server_send_packet(struct client_t *client, struct packet_t *packet)
+{
+	assert(packet->direction == CLIENTBOUND);
+}
+
+
+

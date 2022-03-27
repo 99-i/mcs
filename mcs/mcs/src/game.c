@@ -358,6 +358,8 @@ static void sb_handle_handshake(struct client_t *client, struct packet_t *packet
 }
 static void sb_handle_request(struct client_t *client, struct packet_t *packet)
 {
+	struct packet_t response_packet;
+	write_packet_response(&response_packet, "test");
 
 }
 static void sb_handle_ping(struct client_t *client, struct packet_t *packet)

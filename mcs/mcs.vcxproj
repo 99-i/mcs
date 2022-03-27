@@ -33,6 +33,7 @@
     <ClInclude Include="mcs\include\game.h" />
     <ClInclude Include="mcs\include\mcs.h" />
     <ClInclude Include="mcs\include\mc_packets.h" />
+    <ClInclude Include="mcs\include\server.h" />
     <ClInclude Include="mcs\include\util.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
