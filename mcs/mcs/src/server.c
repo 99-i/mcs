@@ -120,6 +120,15 @@ void run_network_loop(void *data)
 void server_send_packet(struct client_t *client, struct packet_t *packet)
 {
 	assert(packet->direction == CLIENTBOUND);
+	buffer_t send_buffer = construct_buffer();
+
+
+
+	if (!strcmp(packet->type, "Response"))
+	{
+
+	}
+
 }
 
 
