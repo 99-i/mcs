@@ -9,25 +9,15 @@
 #include "mcs.h"
 #undef uuid_t
 
-struct slabinfo_t
-{
-	size_t num_slabs;
-	struct slab_t *slabs;
-}
-slabinfo;
 
+struct slabinfo_t slabinfo;
 static uint8_t read_varint(uint8_t *data, uint8_t max, int32_t *dest);
-static uint8_t read_string_255(uint8_t *data, uint8_t max, char **dest);
 static uint8_t read_unsigned_short(uint8_t *data, uint8_t max, uint16_t *dest);
 static uint8_t read_unsigned_byte(uint8_t *data, uint8_t max, uint8_t *dest);
-static uint8_t read_string_32767(uint8_t *data, uint8_t max, char **dest);
 static uint8_t read_long(uint8_t *data, uint8_t max, int64_t *dest);
 static uint8_t read_unsigned_long(uint8_t *data, uint8_t max, uint64_t *dest);
 static uint8_t read_chat(uint8_t *data, uint8_t max, char **dest);
-static uint8_t read_string_20(uint8_t *data, uint8_t max, char **dest);
 static uint8_t read_uuid(uint8_t *data, uint8_t max, struct uuid_t *dest);
-static uint8_t read_string_16(uint8_t *data, uint8_t max, char **dest);
-static uint8_t read_identifier(uint8_t *data, uint8_t max, char **dest);
 static uint8_t read_boolean(uint8_t *data, uint8_t max, _Bool *dest);
 static uint8_t read_double(uint8_t *data, uint8_t max, double *dest);
 static uint8_t read_int(uint8_t *data, uint8_t max, int32_t *dest);
@@ -35,12 +25,8 @@ static uint8_t read_short(uint8_t *data, uint8_t max, int16_t *dest);
 static uint8_t read_position(uint8_t *data, uint8_t max, struct position_t *dest);
 static uint8_t read_byte(uint8_t *data, uint8_t max, int8_t *dest);
 static uint8_t read_float(uint8_t *data, uint8_t max, float *dest);
-static uint8_t read_string_40(uint8_t *data, uint8_t max, char **dest);
-static uint8_t read_string_256(uint8_t *data, uint8_t max, char **dest);
-static uint8_t read_string_32500(uint8_t *data, uint8_t max, char **dest);
 static uint8_t read_string(uint8_t *data, uint8_t max, char **dest);
 static uint8_t read_varlong(uint8_t *data, uint8_t max, int64_t *dest);
-static uint8_t read_string_384(uint8_t *data, uint8_t max, char **dest);
 
 struct packet_metadata_t get_packet_metadata(uint32_t data_length, uint8_t *data)
 {
@@ -168,7 +154,7 @@ enum efield_type field_str_to_field_type(char *str)
 	}
 	else if (!strcmp(str, "Identifier"))
 	{
-		return FT_IDENTIFIER;
+		return FT_STRING;
 	}
 	else if (!strcmp(str, "Boolean"))
 	{
@@ -204,35 +190,35 @@ enum efield_type field_str_to_field_type(char *str)
 	}
 	else if (!strcmp(str, "String (16)"))
 	{
-		return FT_STRING_16;
+		return FT_STRING;
 	}
 	else if (!strcmp(str, "String (20)"))
 	{
-		return FT_STRING_20;
+		return FT_STRING;
 	}
 	else if (!strcmp(str, "String (40)"))
 	{
-		return FT_STRING_40;
+		return FT_STRING;
 	}
 	else if (!strcmp(str, "String (255)"))
 	{
-		return FT_STRING_255;
+		return FT_STRING;
 	}
 	else if (!strcmp(str, "String (256)"))
 	{
-		return FT_STRING_256;
+		return FT_STRING;
 	}
 	else if (!strcmp(str, "String (384)"))
 	{
-		return FT_STRING_384;
+		return FT_STRING;
 	}
 	else if (!strcmp(str, "String (32500)"))
 	{
-		return FT_STRING_32500;
+		return FT_STRING;
 	}
 	else if (!strcmp(str, "String (32767)"))
 	{
-		return FT_STRING_32767;
+		return FT_STRING;
 	}
 	else if (!strcmp(str, "String"))
 	{
@@ -275,30 +261,20 @@ bool create_serverbound_packet(uint32_t data_size, uint8_t *data, enum estate st
 	uint32_t data_needle = 0;
 	data_needle += read_varint(data, data_size, 0);
 	data_needle += read_varint(data + data_needle, data_size - data_needle, 0);
+
 	int32_t the_varint;
-	char *the_string_255 = 0;
+	char** the_string;
 	uint16_t the_unsigned_short;
 	uint8_t the_unsigned_byte;
-	char *the_string_32767 = 0;
-	int64_t the_long;
-	char *the_identifier = 0;
-	char *the_chat = 0;
-	char *the_string_20 = 0;
-	struct uuid_t the_uuid;
-	char *the_string_16 = 0;
+	int64_t* the_long;
+	struct uuid_t* the_uuid;
 	bool the_boolean;
-	double the_double;
+	double* the_double;
 	int32_t the_int;
 	int16_t the_short;
-	struct position_t the_position;
+	struct position_t* the_position;
 	int8_t the_byte;
 	float the_float;
-	char *the_string_40 = 0;
-	char *the_string_256 = 0;
-	char *the_string_32500 = 0;
-	char *the_string = 0;
-	int64_t the_varlong;
-	char *the_string_384 = 0;
 
 	for (i = 0; i < slabinfo.num_slabs; i++)
 	{
@@ -316,103 +292,74 @@ bool create_serverbound_packet(uint32_t data_size, uint8_t *data, enum estate st
 				{
 					case FT_VARINT:
 						data_needle += read_varint(data + data_needle, data_size - data_needle, &the_varint);
-						map_set_int32(packet->map, slab->fields[j].field_name, the_varint);
+						map_set(packet->map, slab->fields[j].field_name, the_varint);
 						break;
 					case FT_UNSIGNED_SHORT:
 						data_needle += read_unsigned_short(data + data_needle, data_size - data_needle, &the_unsigned_short);
-						map_set_uint16(packet->map, slab->fields[j].field_name, the_unsigned_short);
+						map_set(packet->map, slab->fields[j].field_name, the_unsigned_short);
 						break;
 					case FT_UNSIGNED_BYTE:
 						data_needle += read_unsigned_byte(data + data_needle, data_size - data_needle, &the_unsigned_byte);
-						map_set_uint8(packet->map, slab->fields[j].field_name, the_unsigned_byte);
+						map_set(packet->map, slab->fields[j].field_name, the_unsigned_byte);
 						break;
 					case FT_LONG:
-						data_needle += read_long(data + data_needle, data_size - data_needle, &the_long);
-						map_set_int64(packet->map, slab->fields[j].field_name, the_long);
+						the_long = malloc(sizeof(int64_t));
+						data_needle += read_long(data + data_needle, data_size - data_needle, the_long);
+						map_set(packet->map, slab->fields[j].field_name, the_long);
 						break;
 					case FT_CHAT:
-						data_needle += read_chat(data + data_needle, data_size - data_needle, &the_chat);
-						map_set_string(packet->map, slab->fields[j].field_name, the_chat);
+						the_string = malloc(sizeof(char*));
+						data_needle += read_chat(data + data_needle, data_size - data_needle, the_string);
+						map_set(packet->map, slab->fields[j].field_name, *the_string);
 						break;
 					case FT_UUID:
-						data_needle += read_uuid(data + data_needle, data_size - data_needle, &the_uuid);
-						map_set_uuid(packet->map, slab->fields[j].field_name, the_uuid);
-						break;
-					case FT_IDENTIFIER:
-						data_needle += read_identifier(data + data_needle, data_size - data_needle, &the_identifier);
-						map_set_string(packet->map, slab->fields[j].field_name, the_identifier);
+						the_uuid = malloc(sizeof(struct uuid_t));
+						data_needle += read_uuid(data + data_needle, data_size - data_needle, the_uuid);
+						map_set(packet->map, slab->fields[j].field_name, the_uuid);
 						break;
 					case FT_BOOLEAN:
 						data_needle += read_boolean(data + data_needle, data_size - data_needle, &the_boolean);
-						map_set_boolean(packet->map, slab->fields[j].field_name, the_boolean);
+						map_set(packet->map, slab->fields[j].field_name, the_boolean);
 						break;
 					case FT_DOUBLE:
-						data_needle += read_double(data + data_needle, data_size - data_needle, &the_double);
-						map_set_double(packet->map, slab->fields[j].field_name, the_double);
+						the_double = malloc(sizeof(double));
+						data_needle += read_double(data + data_needle, data_size - data_needle, the_double);
+						map_set(packet->map, slab->fields[j].field_name, *((void**)&the_double));
 						break;
 					case FT_ANGLE:
 						data_needle += read_unsigned_byte(data + data_needle, data_size - data_needle, &the_unsigned_byte);
-						map_set_uint8(packet->map, slab->fields[j].field_name, the_unsigned_byte);
+						map_set(packet->map, slab->fields[j].field_name, the_unsigned_byte);
 						break;
 					case FT_INT:
 						data_needle += read_int(data + data_needle, data_size - data_needle, &the_int);
-						map_set_int32(packet->map, slab->fields[j].field_name, the_int);
+						map_set(packet->map, slab->fields[j].field_name, the_int);
 						break;
 					case FT_SHORT:
 						data_needle += read_short(data + data_needle, data_size - data_needle, &the_short);
-						map_set_int16(packet->map, slab->fields[j].field_name, the_short);
+						map_set(packet->map, slab->fields[j].field_name, the_short);
 						break;
 					case FT_POSITION:
-						data_needle += read_position(data + data_needle, data_size - data_needle, &the_position);
-						map_set_position(packet->map, slab->fields[j].field_name, the_position);
+						the_position = malloc(sizeof(struct position_t));
+						data_needle += read_position(data + data_needle, data_size - data_needle, the_position);
+						map_set(packet->map, slab->fields[j].field_name, the_position);
 						break;
 					case FT_BYTE:
 						data_needle += read_byte(data + data_needle, data_size - data_needle, &the_byte);
-						map_set_uint8(packet->map, slab->fields[j].field_name, the_byte);
+						map_set(packet->map, slab->fields[j].field_name, the_byte);
 						break;
 					case FT_FLOAT:
 						data_needle += read_float(data + data_needle, data_size - data_needle, &the_float);
-						map_set_float(packet->map, slab->fields[j].field_name, the_float);
-						break;
-					case FT_STRING_16:
-						data_needle += read_string_16(data + data_needle, data_size - data_needle, &the_string_16);
-						map_set_string(packet->map, slab->fields[j].field_name, the_string_16);
-						break;
-					case FT_STRING_20:
-						data_needle += read_string_20(data + data_needle, data_size - data_needle, &the_string_20);
-						map_set_string(packet->map, slab->fields[j].field_name, the_string_20);
-						break;
-					case FT_STRING_40:
-						data_needle += read_string_40(data + data_needle, data_size - data_needle, &the_string_40);
-						map_set_string(packet->map, slab->fields[j].field_name, the_string_40);
-						break;
-					case FT_STRING_255:
-						data_needle += read_string_255(data + data_needle, data_size - data_needle, &the_string_255);
-						map_set_string(packet->map, slab->fields[j].field_name, the_string_255);
-						break;
-					case FT_STRING_256:
-						data_needle += read_string_256(data + data_needle, data_size - data_needle, &the_string_256);
-						map_set_string(packet->map, slab->fields[j].field_name, the_string_256);
-						break;
-					case FT_STRING_384:
-						data_needle += read_string_384(data + data_needle, data_size - data_needle, &the_string_384);
-						map_set_string(packet->map, slab->fields[j].field_name, the_string_384);
-						break;
-					case FT_STRING_32500:
-						data_needle += read_string_32500(data + data_needle, data_size - data_needle, &the_string_32500);
-						map_set_string(packet->map, slab->fields[j].field_name, the_string_32500);
-						break;
-					case FT_STRING_32767:
-						data_needle += read_string_32767(data + data_needle, data_size - data_needle, &the_string_32767);
-						map_set_string(packet->map, slab->fields[j].field_name, the_string_32767);
+						map_set(packet->map, slab->fields[j].field_name, *((void**)&the_float));
 						break;
 					case FT_STRING:
-						data_needle += read_string(data + data_needle, data_size - data_needle, &the_string);
-						map_set_string(packet->map, slab->fields[j].field_name, the_string);
+						the_string = malloc(sizeof(char*));
+						data_needle += read_string(data + data_needle, data_size - data_needle, the_string);
+						map_set(packet->map, slab->fields[j].field_name, *the_string);
 						break;
 					case FT_VARLONG:
-						data_needle += read_varlong(data + data_needle, data_size - data_needle, &the_varlong);
-						map_set_int64(packet->map, slab->fields[j].field_name, the_varlong);
+						the_long = malloc(sizeof(int64_t));
+						data_needle += read_varlong(data + data_needle, data_size - data_needle, the_long);
+						map_set(packet->map, slab->fields[j].field_name, the_long);
 						break;
 					default:
 						break;
@@ -479,7 +426,14 @@ static uint8_t read_long(uint8_t *data, uint8_t max, int64_t *dest)
 		return 0;
 	}
 	*dest = 0;
-	*dest = ((uint64_t)data[0] << 40) | ((uint64_t)data[1] << 32) | ((uint64_t)data[2] << 24) | ((uint64_t)data[3] << 16) | ((uint64_t)data[4] << 8) | data[5];
+	*dest = (((uint64_t)data[0]) << 56) |
+			(((uint64_t)data[1]) << 48) |
+			(((uint64_t)data[2]) << 40) |
+			(((uint64_t)data[3]) << 32) |
+			(((uint64_t)data[4]) << 24) |
+			(((uint64_t)data[5]) << 16) |
+			(((uint64_t)data[6]) << 8) |
+			(((uint64_t)data[7]) << 0);
 	return 8;
 }
 static uint8_t read_chat(uint8_t *data, uint8_t max, char **dest)
@@ -627,238 +581,16 @@ static uint8_t read_float(uint8_t *data, uint8_t max, float *dest)
 {
 
 }
-static uint8_t read_string_40(uint8_t *data, uint8_t max, char **dest)
-{
-	int32_t strlength;
-	size_t i = 0;
-	char *str;
-	uint8_t varint_length;
-	varint_length = read_varint(data, max, &strlength);
-	if (strlength > 40)
-	{
-		return 0;
-	}
-	str = malloc(strlength + 1);
-	for (; i < strlength; i++)
-	{
-		if (i + varint_length > max)
-		{
-			free(str);
-			return 0;
-		}
-		str[i] = data[i + varint_length];
-	}
-	str[strlength] = 0; *dest = _strdup(str);
-	return i + varint_length;
-}
-static uint8_t read_string_256(uint8_t *data, uint8_t max, char **dest)
-{
-	int32_t strlength;
-	size_t i = 0;
-	char *str;
-	uint8_t varint_length;
-	varint_length = read_varint(data, max, &strlength);
-	if (strlength > 256)
-	{
-		return 0;
-	}
-	str = malloc(strlength + 1);
-	for (; i < strlength; i++)
-	{
-		if (i + varint_length > max)
-		{
-			free(str);
-			return 0;
-		}
-		str[i] = data[i + varint_length];
-	}
-	str[strlength] = 0; *dest = _strdup(str);
-	return i + varint_length;
-}
-static uint8_t read_string_32500(uint8_t *data, uint8_t max, char **dest)
-{
-	int32_t strlength;
-	size_t i = 0;
-	char *str;
-	uint8_t varint_length;
-	varint_length = read_varint(data, max, &strlength);
-	if (strlength > 32500)
-	{
-		return 0;
-	}
-	str = malloc(strlength + 1);
-	for (; i < strlength; i++)
-	{
-		if (i + varint_length > max)
-		{
-			free(str);
-			return 0;
-		}
-		str[i] = data[i + varint_length];
-	}
-	str[strlength] = 0; *dest = _strdup(str);
-	return i + varint_length;
-}
 static uint8_t read_string(uint8_t *data, uint8_t max, char **dest)
-{
-	int32_t strlength;
-	size_t i = 0;
-	char *str;
-	uint8_t varint_length;
-	varint_length = read_varint(data, max, &strlength);
-	if (strlength > 32767)
-	{
-		return 0;
-	}
-	str = malloc(strlength + 1);
-	for (; i < strlength; i++)
-	{
-		if (i + varint_length > max)
-		{
-			free(str);
-			return 0;
-		}
-		str[i] = data[i + varint_length];
-	}
-	str[strlength] = 0; *dest = _strdup(str);
-	return i + varint_length;
-}
-static uint8_t read_string_384(uint8_t *data, uint8_t max, char **dest)
-{
-	int32_t strlength;
-	size_t i = 0;
-	char *str;
-	uint8_t varint_length;
-	varint_length = read_varint(data, max, &strlength);
-	if (strlength > 384)
-	{
-		return 0;
-	}
-	str = malloc(strlength + 1);
-	for (; i < strlength; i++)
-	{
-		if (i + varint_length > max)
-		{
-			free(str);
-			return 0;
-		}
-		str[i] = data[i + varint_length];
-	}
-	str[strlength] = 0; *dest = _strdup(str);
-	return i + varint_length;
-}
-static uint8_t read_identifier(uint8_t *data, uint8_t max, char **dest)
-{
-	int32_t strlength;
-	size_t i = 0;
-	char *str;
-	uint8_t varint_length;
-	varint_length = read_varint(data, max, &strlength);
-	if (strlength > 32767)
-	{
-		return 0;
-	}
-	str = malloc(strlength + 1);
-	for (; i < strlength; i++)
-	{
-		if (i + varint_length > max)
-		{
-			free(str);
-			return 0;
-		}
-		str[i] = data[i + varint_length];
-	}
-	str[strlength] = 0; *dest = _strdup(str);
-	return i + varint_length;
-}
-static uint8_t read_string_16(uint8_t *data, uint8_t max, char **dest)
-{
-	int32_t strlength;
-	size_t i = 0;
-	char *str;
-	uint8_t varint_length;
-	varint_length = read_varint(data, max, &strlength);
-	if (strlength > 16)
-	{
-		return 0;
-	}
-	str = malloc(strlength + 1);
-	for (; i < strlength; i++)
-	{
-		if (i + varint_length > max)
-		{
-			free(str);
-			return 0;
-		}
-		str[i] = data[i + varint_length];
-	}
-	str[strlength] = 0; *dest = _strdup(str);
-	return i + varint_length;
-}
-static uint8_t read_string_20(uint8_t *data, uint8_t max, char **dest)
-{
-	int32_t strlength;
-	size_t i = 0;
-	char *str;
-	uint8_t varint_length;
-	varint_length = read_varint(data, max, &strlength);
-	if (strlength > 20)
-	{
-		return 0;
-	}
-	str = malloc(strlength + 1);
-	for (; i < strlength; i++)
-	{
-		if (i + varint_length > max)
-		{
-			free(str);
-			return 0;
-		}
-		str[i] = data[i + varint_length];
-	}
-	str[strlength] = 0;
-	*dest = _strdup(str);
-	return i + varint_length;
-}
-static uint8_t read_string_32767(uint8_t *data, uint8_t max, char **dest)
-{
-	int32_t strlength;
-	size_t i = 0;
-	char *str;
-	uint8_t varint_length;
-	varint_length = read_varint(data, max, &strlength);
-	if (strlength > 32767)
-	{
-		return 0;
-	}
-	str = malloc(strlength + 1);
-	for (; i < strlength; i++)
-	{
-		if (i + varint_length > max)
-		{
-			free(str);
-			return 0;
-		}
-		str[i] = data[i + varint_length];
-	}
-	str[strlength] = 0; *dest = _strdup(str);
-	return i + varint_length;
-}
-static uint8_t read_string_255(uint8_t *data, uint8_t max, char **dest)
 {
 	int32_t strlength;
 	size_t i;
 	char *str;
 	uint8_t varint_length;
 	varint_length = read_varint(data, max, &strlength);
-	if (strlength > 255)
+	if (strlength > 32767)
 	{
 		return 0;
-	}
-	if (strlength < 1)
-	{
-		return varint_length;
-
 	}
 	str = malloc(strlength + 1);
 	for (i = 0; i < strlength; i++)
@@ -870,10 +602,99 @@ static uint8_t read_string_255(uint8_t *data, uint8_t max, char **dest)
 		}
 		str[i] = data[i + varint_length];
 	}
-	str[strlength] = 0;
-	*dest = _strdup(str);
+	str[strlength] = 0; *dest = _strdup(str);
 	return i + varint_length;
 }
+
+struct packet_t* construct_clientbound_packet(char* packet_type, ...)
+{
+	struct packet_t* packet = malloc(sizeof(struct packet_t));
+	struct slab_t* current_slab = 0;
+	struct field_t* current_field = 0;
+
+	va_list argp;
+
+	va_start(argp, packet_type);
+
+	size_t i;
+
+	packet->direction = CLIENTBOUND;
+
+	for (i = 0; i < slabinfo.num_slabs; i++)
+	{
+		if (!strcmp(packet_type, slabinfo.slabs[i].name))
+		{
+			current_slab = &slabinfo.slabs[i];
+		}
+	}
+
+	assert(current_slab != 0);
+	assert(current_slab->direction == CLIENTBOUND);
+
+	packet->type = packet_type;
+	packet->map = construct_map();
+
+	i32 int32;
+	u16 uint16;
+	u8 uint8;
+	char* ch;
+
+	for (i = 0; i < current_slab->num_fields; i++)
+	{
+		current_field = &current_slab->fields[i];
+
+		switch (current_field->fieldinfo.type)
+		{
+		case FT_VARINT:
+		case FT_INT:
+			int32 = va_arg(argp, i32);
+			break;
+		case FT_UNSIGNED_SHORT:
+			uint16 = va_arg(argp, u16);
+			break;
+		case FT_UNSIGNED_BYTE:
+			uint8 = va_arg(argp, u8);
+		case FT_ANGLE:
+		case FT_BOOLEAN:
+			break;
+		case FT_LONG:
+		case FT_VARLONG:
+			break;
+		case FT_UUID:
+			break;
+		case FT_DOUBLE:
+			break;
+		case FT_SHORT:
+			break;
+		case FT_POSITION:
+			break;
+		case FT_BYTE:
+			break;
+		case FT_FLOAT:
+			break;
+		case FT_STRING:
+		case FT_CHAT:
+			ch = va_arg(argp, char*);
+			map_set(packet->map, current_field->field_name, _strdup(ch));
+			break;
+		default:
+			break;
+		}
+
+
+	}
+
+	va_end(argp);
+
+	return packet;
+}
+
+void packet_free(struct packet_t* packet)
+{
+
+}
+
+
 static uint8_t read_varlong(uint8_t *data, uint8_t max, int64_t *dest)
 {
 	int64_t decoded_long = 0;
@@ -903,555 +724,17 @@ static uint8_t read_varlong(uint8_t *data, uint8_t max, int64_t *dest)
 	return len;
 }
 
-
-bool construct_packet_response(struct packet_t *packet, char *json_response)
-{
-	packet->type = _strdup("Response");
-	packet->direction = CLIENTBOUND;
-}
-bool construct_packet_pong(struct packet_t *packet, int64_t payload)
-{
-	packet->type = _strdup("Pong");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int64(packet->map, "Payload", payload);
-}
-bool construct_packet_disconnect_login(struct packet_t *packet, char *reason)
-{
-	packet->type = _strdup("Disconnect (login)");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_string(packet->map, "Reason", reason);
-}
-bool construct_packet_login_success(struct packet_t *packet, struct uuid_t uuid, char *username)
-{
-	packet->type = _strdup("Login Success");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_uuid(packet->map, "UUID", uuid);
-	map_set_string(packet->map, "Username", username);
-}
-bool construct_packet_set_compression(struct packet_t *packet, int32_t threshold)
-{
-	packet->type = _strdup("Set Compression");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Threshold", threshold);
-}
-bool construct_packet_spawn_entity(struct packet_t *packet, int32_t entity_id, struct uuid_t object_uuid, int32_t type, double x, double y, double z, uint8_t pitch, uint8_t yaw, int32_t data, int16_t velocity_x, int16_t velocity_y, int16_t velocity_z)
-{
-	packet->type = _strdup("Spawn Entity");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Entity ID", entity_id);
-	map_set_uuid(packet->map, "Object UUID", object_uuid);
-	map_set_int32(packet->map, "Type", type);
-	map_set_double(packet->map, "X", x);
-	map_set_double(packet->map, "Y", y);
-	map_set_double(packet->map, "Z", z);
-	map_set_uint8(packet->map, "Pitch", pitch);
-	map_set_uint8(packet->map, "Yaw", yaw);
-	map_set_int32(packet->map, "Data", data);
-	map_set_int16(packet->map, "Velocity X", velocity_x);
-	map_set_int16(packet->map, "Velocity Y", velocity_y);
-	map_set_int16(packet->map, "Velocity Z", velocity_z);
-}
-bool construct_packet_spawn_experience_orb(struct packet_t *packet, int32_t entity_id, double x, double y, double z, int16_t count)
-{
-	packet->type = _strdup("Spawn Experience Orb");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Entity ID", entity_id);
-	map_set_double(packet->map, "X", x);
-	map_set_double(packet->map, "Y", y);
-	map_set_double(packet->map, "Z", z);
-	map_set_int16(packet->map, "Count", count);
-}
-bool construct_packet_spawn_living_entity(struct packet_t *packet, int32_t entity_id, struct uuid_t entity_uuid, int32_t type, double x, double y, double z, uint8_t yaw, uint8_t pitch, uint8_t head_pitch, int16_t velocity_x, int16_t velocity_y, int16_t velocity_z)
-{
-	packet->type = _strdup("Spawn Living Entity");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Entity ID", entity_id);
-	map_set_uuid(packet->map, "Entity UUID", entity_uuid);
-	map_set_int32(packet->map, "Type", type);
-	map_set_double(packet->map, "X", x);
-	map_set_double(packet->map, "Y", y);
-	map_set_double(packet->map, "Z", z);
-	map_set_uint8(packet->map, "Yaw", yaw);
-	map_set_uint8(packet->map, "Pitch", pitch);
-	map_set_uint8(packet->map, "Head Pitch", head_pitch);
-	map_set_int16(packet->map, "Velocity X", velocity_x);
-	map_set_int16(packet->map, "Velocity Y", velocity_y);
-	map_set_int16(packet->map, "Velocity Z", velocity_z);
-}
-bool construct_packet_spawn_player(struct packet_t *packet, int32_t entity_id, struct uuid_t player_uuid, double x, double y, double z, uint8_t yaw, uint8_t pitch)
-{
-	packet->type = _strdup("Spawn Player");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Entity ID", entity_id);
-	map_set_uuid(packet->map, "Player UUID", player_uuid);
-	map_set_double(packet->map, "X", x);
-	map_set_double(packet->map, "Y", y);
-	map_set_double(packet->map, "Z", z);
-	map_set_uint8(packet->map, "Yaw", yaw);
-	map_set_uint8(packet->map, "Pitch", pitch);
-}
-bool construct_packet_entity_animation(struct packet_t *packet, int32_t entity_id, uint8_t animation)
-{
-	packet->type = _strdup("Entity Animation (clientbound)");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Entity ID", entity_id);
-	map_set_uint8(packet->map, "Animation", animation);
-}
-bool construct_packet_acknowledge_player_digging(struct packet_t *packet, struct position_t location, int32_t block, int32_t status, bool successful)
-{
-	packet->type = _strdup("Acknowledge Player Digging");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_position(packet->map, "Location", location);
-	map_set_int32(packet->map, "Block", block);
-	map_set_int32(packet->map, "Status", status);
-	map_set_boolean(packet->map, "Successful", successful);
-}
-bool construct_packet_block_break_animation(struct packet_t *packet, int32_t entity_id, struct position_t location, int8_t destroy_stage)
-{
-	packet->type = _strdup("Block Break Animation");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Entity ID", entity_id);
-	map_set_position(packet->map, "Location", location);
-	map_set_int8(packet->map, "Destroy Stage", destroy_stage);
-}
-bool construct_packet_block_action(struct packet_t *packet, struct position_t location, uint8_t action_id_byte_1, uint8_t action_param_byte_2, int32_t block_type)
-{
-	packet->type = _strdup("Block Action");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_position(packet->map, "Location", location);
-	map_set_uint8(packet->map, "Action ID (Byte 1)", action_id_byte_1);
-	map_set_uint8(packet->map, "Action Param (Byte 2)", action_param_byte_2);
-	map_set_int32(packet->map, "Block Type", block_type);
-}
-bool construct_packet_block_change(struct packet_t *packet, struct position_t location, int32_t block_id)
-{
-	packet->type = _strdup("Block Change");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_position(packet->map, "Location", location);
-	map_set_int32(packet->map, "Block ID", block_id);
-}
-bool construct_packet_server_difficulty(struct packet_t *packet, uint8_t difficulty, bool difficulty_locked)
-{
-	packet->type = _strdup("Server Difficulty");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_uint8(packet->map, "Difficulty", difficulty);
-	map_set_boolean(packet->map, "Difficulty locked?", difficulty_locked);
-}
-bool construct_packet_chat_message(struct packet_t *packet, char *json_data, int8_t position, struct uuid_t sender)
-{
-	packet->type = _strdup("Chat Message (clientbound)");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_string(packet->map, "JSON Data", json_data);
-	map_set_int8(packet->map, "Position", position);
-	map_set_uuid(packet->map, "Sender", sender);
-}
-bool construct_packet_window_confirmation(struct packet_t *packet, int8_t window_id, int16_t action_number, bool accepted)
-{
-	packet->type = _strdup("Window Confirmation (clientbound)");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int8(packet->map, "Window ID", window_id);
-	map_set_int16(packet->map, "Action Number", action_number);
-	map_set_boolean(packet->map, "Accepted", accepted);
-}
-bool construct_packet_close_window(struct packet_t *packet, uint8_t window_id)
-{
-	packet->type = _strdup("Close Window (clientbound)");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_uint8(packet->map, "Window ID", window_id);
-}
-bool construct_packet_window_property(struct packet_t *packet, uint8_t window_id, int16_t property, int16_t value)
-{
-	packet->type = _strdup("Window Property");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_uint8(packet->map, "Window ID", window_id);
-	map_set_int16(packet->map, "Property", property);
-	map_set_int16(packet->map, "Value", value);
-}
-bool construct_packet_set_cooldown(struct packet_t *packet, int32_t item_id, int32_t cooldown_ticks)
-{
-	packet->type = _strdup("Set Cooldown");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Item ID", item_id);
-	map_set_int32(packet->map, "Cooldown Ticks", cooldown_ticks);
-}
-bool construct_packet_named_sound_effect(struct packet_t *packet, char *sound_name, int32_t sound_category, int32_t effect_position_x, int32_t effect_position_y, int32_t effect_position_z, float volume, float pitch)
-{
-	packet->type = _strdup("Named Sound Effect");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_string(packet->map, "Sound Name", sound_name);
-	map_set_int32(packet->map, "Sound Category", sound_category);
-	map_set_int32(packet->map, "Effect Position X", effect_position_x);
-	map_set_int32(packet->map, "Effect Position Y", effect_position_y);
-	map_set_int32(packet->map, "Effect Position Z", effect_position_z);
-	map_set_float(packet->map, "Volume", volume);
-	map_set_float(packet->map, "Pitch", pitch);
-}
-bool construct_packet_disconnect_play(struct packet_t *packet, char *reason)
-{
-	packet->type = _strdup("Disconnect (play)");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_string(packet->map, "Reason", reason);
-}
-bool construct_packet_unload_chunk(struct packet_t *packet, int32_t chunk_x, int32_t chunk_z)
-{
-	packet->type = _strdup("Unload Chunk");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Chunk X", chunk_x);
-	map_set_int32(packet->map, "Chunk Z", chunk_z);
-}
-bool construct_packet_change_game_state(struct packet_t *packet, uint8_t reason, float value)
-{
-	packet->type = _strdup("Change Game State");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_uint8(packet->map, "Reason", reason);
-	map_set_float(packet->map, "Value", value);
-}
-bool construct_packet_open_horse_window(struct packet_t *packet, int8_t window_id, int32_t number_of_slots, int32_t entity_id)
-{
-	packet->type = _strdup("Open Horse Window");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int8(packet->map, "Window ID?", window_id);
-	map_set_int32(packet->map, "Number of slots?", number_of_slots);
-	map_set_int32(packet->map, "Entity ID?", entity_id);
-}
-bool construct_packet_keep_alive(struct packet_t *packet, int64_t keep_alive_id)
-{
-	packet->type = _strdup("Keep Alive (clientbound)");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int64(packet->map, "Keep Alive ID", keep_alive_id);
-}
-bool construct_packet_effect(struct packet_t *packet, int32_t effect_id, struct position_t location, int32_t data, bool disable_relative_volume)
-{
-	packet->type = _strdup("Effect");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Effect ID", effect_id);
-	map_set_position(packet->map, "Location", location);
-	map_set_int32(packet->map, "Data", data);
-	map_set_boolean(packet->map, "Disable Relative Volume", disable_relative_volume);
-}
-bool construct_packet_entity_position(struct packet_t *packet, int32_t entity_id, int16_t delta_x, int16_t delta_y, int16_t delta_z, bool on_ground)
-{
-	packet->type = _strdup("Entity Position");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Entity ID", entity_id);
-	map_set_int16(packet->map, "Delta X", delta_x);
-	map_set_int16(packet->map, "Delta Y", delta_y);
-	map_set_int16(packet->map, "Delta Z", delta_z);
-	map_set_boolean(packet->map, "On Ground", on_ground);
-}
-bool construct_packet_entity_position_and_rotation(struct packet_t *packet, int32_t entity_id, int16_t delta_x, int16_t delta_y, int16_t delta_z, uint8_t yaw, uint8_t pitch, bool on_ground)
-{
-	packet->type = _strdup("Entity Position and Rotation");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Entity ID", entity_id);
-	map_set_int16(packet->map, "Delta X", delta_x);
-	map_set_int16(packet->map, "Delta Y", delta_y);
-	map_set_int16(packet->map, "Delta Z", delta_z);
-	map_set_uint8(packet->map, "Yaw", yaw);
-	map_set_uint8(packet->map, "Pitch", pitch);
-	map_set_boolean(packet->map, "On Ground", on_ground);
-}
-bool construct_packet_entity_rotation(struct packet_t *packet, int32_t entity_id, uint8_t yaw, uint8_t pitch, bool on_ground)
-{
-	packet->type = _strdup("Entity Rotation");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Entity ID", entity_id);
-	map_set_uint8(packet->map, "Yaw", yaw);
-	map_set_uint8(packet->map, "Pitch", pitch);
-	map_set_boolean(packet->map, "On Ground", on_ground);
-}
-bool construct_packet_entity_movement(struct packet_t *packet, int32_t entity_id)
-{
-	packet->type = _strdup("Entity Movement");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Entity ID", entity_id);
-}
-bool construct_packet_vehicle_move(struct packet_t *packet, double x, double y, double z, float yaw, float pitch)
-{
-	packet->type = _strdup("Vehicle Move (clientbound)");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_double(packet->map, "X", x);
-	map_set_double(packet->map, "Y", y);
-	map_set_double(packet->map, "Z", z);
-	map_set_float(packet->map, "Yaw", yaw);
-	map_set_float(packet->map, "Pitch", pitch);
-}
-bool construct_packet_open_book(struct packet_t *packet, int32_t hand)
-{
-	packet->type = _strdup("Open Book");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Hand", hand);
-}
-bool construct_packet_open_window(struct packet_t *packet, int32_t window_id, int32_t window_type, char *window_title)
-{
-	packet->type = _strdup("Open Window");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Window ID", window_id);
-	map_set_int32(packet->map, "Window Type", window_type);
-	map_set_string(packet->map, "Window Title", window_title);
-}
-bool construct_packet_open_sign_editor(struct packet_t *packet, struct position_t location)
-{
-	packet->type = _strdup("Open Sign Editor");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_position(packet->map, "Location", location);
-}
-bool construct_packet_craft_recipe_response(struct packet_t *packet, int8_t window_id, char *recipe)
-{
-	packet->type = _strdup("Craft Recipe Response");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int8(packet->map, "Window ID", window_id);
-	map_set_string(packet->map, "Recipe", recipe);
-}
-bool construct_packet_player_abilities(struct packet_t *packet, int8_t flags, float flying_speed, float field_of_view_modifier)
-{
-	packet->type = _strdup("Player Abilities (clientbound)");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int8(packet->map, "Flags", flags);
-	map_set_float(packet->map, "Flying Speed", flying_speed);
-	map_set_float(packet->map, "Field of View Modifier", field_of_view_modifier);
-}
-bool construct_packet_player_position_and_look(struct packet_t *packet, double x, double y, double z, float yaw, float pitch, int8_t flags, int32_t teleport_id)
-{
-	packet->type = _strdup("Player Position And Look (clientbound)");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_double(packet->map, "X", x);
-	map_set_double(packet->map, "Y", y);
-	map_set_double(packet->map, "Z", z);
-	map_set_float(packet->map, "Yaw", yaw);
-	map_set_float(packet->map, "Pitch", pitch);
-	map_set_int8(packet->map, "Flags", flags);
-	map_set_int32(packet->map, "Teleport ID", teleport_id);
-}
-bool construct_packet_remove_entity_effect(struct packet_t *packet, int32_t entity_id, int8_t effect_id)
-{
-	packet->type = _strdup("Remove Entity Effect");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Entity ID", entity_id);
-	map_set_int8(packet->map, "Effect ID", effect_id);
-}
-bool construct_packet_resource_pack_send(struct packet_t *packet, char *url, char *hash)
-{
-	packet->type = _strdup("Resource Pack Send");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_string(packet->map, "URL", url);
-	map_set_string(packet->map, "Hash", hash);
-}
-bool construct_packet_entity_head_look(struct packet_t *packet, int32_t entity_id, uint8_t head_yaw)
-{
-	packet->type = _strdup("Entity Head Look");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Entity ID", entity_id);
-	map_set_uint8(packet->map, "Head Yaw", head_yaw);
-}
-bool construct_packet_select_advancement_tab(struct packet_t *packet, bool has_id, char *optional_identifier)
-{
-	packet->type = _strdup("Select Advancement Tab");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_boolean(packet->map, "Has id", has_id);
-	map_set_string(packet->map, "Optional Identifier", optional_identifier);
-}
-bool construct_packet_camera(struct packet_t *packet, int32_t camera_id)
-{
-	packet->type = _strdup("Camera");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Camera ID", camera_id);
-}
-bool construct_packet_held_item_change(struct packet_t *packet, int8_t slot)
-{
-	packet->type = _strdup("Held Item Change (clientbound)");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int8(packet->map, "Slot", slot);
-}
-bool construct_packet_update_view_position(struct packet_t *packet, int32_t chunk_x, int32_t chunk_z)
-{
-	packet->type = _strdup("Update View Position");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Chunk X", chunk_x);
-	map_set_int32(packet->map, "Chunk Z", chunk_z);
-}
-bool construct_packet_update_view_distance(struct packet_t *packet, int32_t view_distance)
-{
-	packet->type = _strdup("Update View Distance");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "View Distance", view_distance);
-}
-bool construct_packet_spawn_position(struct packet_t *packet, struct position_t location)
-{
-	packet->type = _strdup("Spawn Position");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_position(packet->map, "Location", location);
-}
-bool construct_packet_display_scoreboard(struct packet_t *packet, int8_t position, char *score_name)
-{
-	packet->type = _strdup("Display Scoreboard");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int8(packet->map, "Position", position);
-	map_set_string(packet->map, "Score Name", score_name);
-}
-bool construct_packet_attach_entity(struct packet_t *packet, int32_t attached_entity_id, int32_t holding_entity_id)
-{
-	packet->type = _strdup("Attach Entity");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Attached Entity ID", attached_entity_id);
-	map_set_int32(packet->map, "Holding Entity ID", holding_entity_id);
-}
-bool construct_packet_entity_velocity(struct packet_t *packet, int32_t entity_id, int16_t velocity_x, int16_t velocity_y, int16_t velocity_z)
-{
-	packet->type = _strdup("Entity Velocity");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Entity ID", entity_id);
-	map_set_int16(packet->map, "Velocity X", velocity_x);
-	map_set_int16(packet->map, "Velocity Y", velocity_y);
-	map_set_int16(packet->map, "Velocity Z", velocity_z);
-}
-bool construct_packet_set_experience(struct packet_t *packet, float experience_bar, int32_t level, int32_t total_experience)
-{
-	packet->type = _strdup("Set Experience");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_float(packet->map, "Experience bar", experience_bar);
-	map_set_int32(packet->map, "Level", level);
-	map_set_int32(packet->map, "Total Experience", total_experience);
-}
-bool construct_packet_update_health(struct packet_t *packet, float health, int32_t food, float food_saturation)
-{
-	packet->type = _strdup("Update Health");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_float(packet->map, "Health", health);
-	map_set_int32(packet->map, "Food", food);
-	map_set_float(packet->map, "Food Saturation", food_saturation);
-}
-bool construct_packet_time_update(struct packet_t *packet, int64_t world_age, int64_t time_of_day)
-{
-	packet->type = _strdup("Time Update");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int64(packet->map, "World Age", world_age);
-	map_set_int64(packet->map, "Time of day", time_of_day);
-}
-bool construct_packet_entity_sound_effect(struct packet_t *packet, int32_t sound_id, int32_t sound_category, int32_t entity_id, float volume, float pitch)
-{
-	packet->type = _strdup("Entity Sound Effect");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Sound ID", sound_id);
-	map_set_int32(packet->map, "Sound Category", sound_category);
-	map_set_int32(packet->map, "Entity ID", entity_id);
-	map_set_float(packet->map, "Volume", volume);
-	map_set_float(packet->map, "Pitch", pitch);
-}
-bool construct_packet_sound_effect(struct packet_t *packet, int32_t sound_id, int32_t sound_category, int32_t effect_position_x, int32_t effect_position_y, int32_t effect_position_z, float volume, float pitch)
-{
-	packet->type = _strdup("Sound Effect");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Sound ID", sound_id);
-	map_set_int32(packet->map, "Sound Category", sound_category);
-	map_set_int32(packet->map, "Effect Position X", effect_position_x);
-	map_set_int32(packet->map, "Effect Position Y", effect_position_y);
-	map_set_int32(packet->map, "Effect Position Z", effect_position_z);
-	map_set_float(packet->map, "Volume", volume);
-	map_set_float(packet->map, "Pitch", pitch);
-}
-bool construct_packet_player_list_header_and_footer(struct packet_t *packet, char *header, char *footer)
-{
-	packet->type = _strdup("Player List Header And Footer");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_string(packet->map, "Header", header);
-	map_set_string(packet->map, "Footer", footer);
-}
-bool construct_packet_collect_item(struct packet_t *packet, int32_t collected_entity_id, int32_t collector_entity_id, int32_t pickup_item_count)
-{
-	packet->type = _strdup("Collect Item");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Collected Entity ID", collected_entity_id);
-	map_set_int32(packet->map, "Collector Entity ID", collector_entity_id);
-	map_set_int32(packet->map, "Pickup Item Count", pickup_item_count);
-}
-bool construct_packet_entity_teleport(struct packet_t *packet, int32_t entity_id, double x, double y, double z, uint8_t yaw, uint8_t pitch, bool on_ground)
-{
-	packet->type = _strdup("Entity Teleport");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Entity ID", entity_id);
-	map_set_double(packet->map, "X", x);
-	map_set_double(packet->map, "Y", y);
-	map_set_double(packet->map, "Z", z);
-	map_set_uint8(packet->map, "Yaw", yaw);
-	map_set_uint8(packet->map, "Pitch", pitch);
-	map_set_boolean(packet->map, "On Ground", on_ground);
-}
-bool construct_packet_entity_effect(struct packet_t *packet, int32_t entity_id, int8_t effect_id, int8_t amplifier, int32_t duration, int8_t flags)
-{
-	packet->type = _strdup("Entity Effect");
-	packet->direction = CLIENTBOUND;
-	packet->map = construct_map();
-	map_set_int32(packet->map, "Entity ID", entity_id);
-	map_set_int8(packet->map, "Effect ID", effect_id);
-	map_set_int8(packet->map, "Amplifier", amplifier);
-	map_set_int32(packet->map, "Duration", duration);
-	map_set_int8(packet->map, "Flags", flags);
-}
-
 uint8_t *make_varint(int32_t varint, size_t *length)
 {
 	buffer_t buf = construct_buffer();
 	uint8_t *data;
+	size_t i = 0;
 	while (true)
 	{
+		if (i == 5)
+		{
+			break;
+		}
 		if ((varint & ~0x7f) == 0)
 		{
 			buffer_append_byte(buf, varint);
@@ -1459,43 +742,43 @@ uint8_t *make_varint(int32_t varint, size_t *length)
 		}
 
 		buffer_append_byte(buf, (varint & 0x7f) | 0x80);
-		// Note: >>> means that the sign bit is shifted with the rest of the number rather than being left alone
 		varint >>= 7;
+		i++;
 	}
 
 	data = buffer_get(buf, length);
+	buffer_free(buf);
 
 	return data;
 
 
 }
-uint8_t *make_unsigned_short(uint16_t unsigned_short, size_t *length)
+uint8_t *make_u16(u16 unsigned_short, size_t *length)
 {
 	buffer_t buf = construct_buffer();
-	size_t total_length;
 	uint8_t *data;
 	buffer_append_byte(buf, (unsigned_short & 0xff00) >> 8);
 	buffer_append_byte(buf, (unsigned_short & 0xff));
 
 	data = buffer_get(buf, length);
+	buffer_free(buf);
 
 	return data;
 }
-uint8_t *make_unsigned_byte(uint8_t unsigned_byte, size_t *length)
+uint8_t *make_u8(u8 unsigned_byte, size_t *length)
 {
 	buffer_t buf = construct_buffer();
-	size_t total_length;
 	uint8_t *data;
 
 	buffer_append_byte(buf, unsigned_byte);
 	data = buffer_get(buf, length);
+	buffer_free(buf);
 
 	return data;
 }
-uint8_t *make_long(int64_t l, size_t *length)
+uint8_t *make_i64(i64 l, size_t *length)
 {
 	buffer_t buf = construct_buffer();
-	size_t total_length;
 	uint8_t *data;
 
 	buffer_append_byte(buf, (l & 0xFF00000000000000) >> 56);
@@ -1507,13 +790,13 @@ uint8_t *make_long(int64_t l, size_t *length)
 	buffer_append_byte(buf, (l & 0xFF00) >> 8);
 	buffer_append_byte(buf, (l & 0xFF));
 	data = buffer_get(buf, length);
+	buffer_free(buf);
 
 	return data;
 }
 uint8_t *make_uuid(struct uuid_t uuid, size_t *length)
 {
 	buffer_t buf = construct_buffer();
-	size_t total_length;
 	uint8_t *data;
 
 	buffer_append_byte(buf, (uuid.high & 0xFF00000000000000) >> 56);
@@ -1534,25 +817,25 @@ uint8_t *make_uuid(struct uuid_t uuid, size_t *length)
 	buffer_append_byte(buf, (uuid.low & 0xFF));
 
 	data = buffer_get(buf, length);
+	buffer_free(buf);
 
 	return data;
 }
 uint8_t *make_boolean(bool boolean, size_t *length)
 {
 	buffer_t buf = construct_buffer();
-	size_t total_length;
 	uint8_t *data;
 
 	buffer_append_byte(buf, boolean);
 
 	data = buffer_get(buf, length);
+	buffer_free(buf);
 
 	return data;
 }
 uint8_t *make_double(double d, size_t *length)
 {
 	buffer_t buf = construct_buffer();
-	size_t total_length;
 	uint8_t *data;
 	buffer_append_byte(buf, ((*(uint64_t *)&d) & 0xFF00000000000000) >> 56);
 	buffer_append_byte(buf, ((*(uint64_t *)&d) & 0xFF000000000000) >> 48);
@@ -1563,54 +846,130 @@ uint8_t *make_double(double d, size_t *length)
 	buffer_append_byte(buf, ((*(uint64_t *)&d) & 0xFF00) >> 8);
 	buffer_append_byte(buf, ((*(uint64_t *)&d) & 0xFF));
 	data = buffer_get(buf, length);
-
+	buffer_free(buf);
 	return data;
 }
 uint8_t *make_angle(uint8_t angle, size_t *length)
 {
 	buffer_t buf = construct_buffer();
-	size_t total_length;
+	uint8_t *data;
 
+	buffer_append_byte(buf, angle);
+	data = buffer_get(buf, length);
+	buffer_free(buf);
+
+	return data;
 }
-uint8_t *make_int(int32_t integer, size_t *length)
+uint8_t *make_i32(i32 integer, size_t *length)
 {
 	buffer_t buf = construct_buffer();
-	size_t total_length;
+	uint8_t *data;
 
+	buffer_append_byte(buf, (integer & 0xff000000) >> 24);
+	buffer_append_byte(buf, (integer & 0xff0000) >> 16);
+	buffer_append_byte(buf, (integer & 0xff00) >> 8);
+	buffer_append_byte(buf, (integer & 0xff));
+
+	data = buffer_get(buf, length);
+	buffer_free(buf);
+
+	return data;
 }
-uint8_t *make_short(int16_t s, size_t *length)
+uint8_t *make_i16(i16 s, size_t *length)
 {
 	buffer_t buf = construct_buffer();
-	size_t total_length;
+	u8 *data;
+
+	buffer_append_byte(buf, (s & 0xff00) >> 8);
+	buffer_append_byte(buf, (s & 0xff));
+
+	data = buffer_get(buf, length);
+	buffer_free(buf);
+
+	return data;
 
 }
 uint8_t *make_position(struct position_t pos, size_t *length)
 {
 	buffer_t buf = construct_buffer();
-	size_t total_length;
+	u8 *data;
+	i64 int_pos = 0;
 
+	pos.x &= 0x3ffffff;
+	pos.z &= 0x3ffffff;
+	pos.y &= 0xfff;
+	int_pos |= (int64_t)pos.x << (64 - 26);
+	int_pos |= (int64_t)pos.z << (64 - 26 - 26);
+	int_pos |= (int64_t)pos.y;
+
+
+	return make_i64(int_pos, length);
 }
-uint8_t *make_byte(int8_t byte, size_t *length)
+uint8_t *make_i8(i8 byte, size_t *length)
 {
 	buffer_t buf = construct_buffer();
-	size_t total_length;
+	uint8_t *data;
+
+	buffer_append_byte(buf, (byte & 0xff));
+
+	data = buffer_get(buf, length);
+	buffer_free(buf);
+	
+	return data;
 
 }
 uint8_t *make_float(float f, size_t *length)
 {
-	buffer_t buf = construct_buffer();
-	size_t total_length;
+	uint64_t data;
+	data = *((uint64_t*)&f);
 
+	return make_i64(data, length);
 }
 uint8_t *make_string(const char *str, size_t *length)
 {
 	buffer_t buf = construct_buffer();
-	size_t total_length;
+	uint8_t* data;
+	size_t str_len = strlen(str);
+	size_t length_size;
+	size_t i;
+	uint8_t* str_length_varint = make_varint(str_len, &length_size);
+
+	buffer_append(buf, str_length_varint, length_size);
+
+	for (i = 0; i < str_len; i++)
+	{
+		buffer_append_byte(buf, str[i]);
+	}
+
+	data = buffer_get(buf, length);
+	buffer_free(buf);
+
+	return data;
 
 }
 uint8_t *make_varlong(int64_t varlong, size_t *length)
 {
 	buffer_t buf = construct_buffer();
-	size_t total_length;
+	uint8_t *data;
+	size_t i = 0;
+	while (true)
+	{
+		if (i == 10)
+		{
+			break;
+		}
+		if ((varlong & ~0x7f) == 0)
+		{
+			buffer_append_byte(buf, varlong);
+			break;
+		}
 
+		buffer_append_byte(buf, (varlong & 0x7f) | 0x80);
+		varlong >>= 7;
+		i++;
+	}
+
+	data = buffer_get(buf, length);
+	buffer_free(buf);
+	return data;
 }

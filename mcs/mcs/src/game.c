@@ -1,4 +1,5 @@
 #include "mcs.h"
+#include "server.h"
 #include <stdio.h>
 #include <assert.h>
 
@@ -115,6 +116,7 @@ struct client_t *game_get_client(uv_tcp_t *socket)
 void game_handle_client_packet(struct client_t *client, struct packet_t *packet)
 {
 	assert(packet->direction == SERVERBOUND);
+	printf("received %s!\n", packet->type);
 
 	if (!strcmp(packet->type, "Handshake"))
 	{
@@ -302,7 +304,8 @@ void game_handle_client_packet(struct client_t *client, struct packet_t *packet)
 	}
 
 
-	map_free(packet->map);
+
+
 }
 
 void game_handle_client_disconnect(uv_tcp_t *client)
@@ -330,8 +333,6 @@ void game_handle_client_disconnect(uv_tcp_t *client)
 	memmove(game->server->clients + i, game->server->clients + i + 1, (--game->server->client_count - i) * sizeof(struct client_t *));
 
 
-
-
 	uv_mutex_unlock(&lock);
 }
 
@@ -341,7 +342,7 @@ static void sb_handle_handshake(struct client_t *client, struct packet_t *packet
 
 	assert((packet->direction == SERVERBOUND) && !strcmp(packet->type, "Handshake"));
 
-	map_get_int32(packet->map, "Next State", &next_state);
+	map_get(packet->map, "Next State", &next_state);
 
 	switch (next_state)
 	{
@@ -358,12 +359,37 @@ static void sb_handle_handshake(struct client_t *client, struct packet_t *packet
 }
 static void sb_handle_request(struct client_t *client, struct packet_t *packet)
 {
-	struct packet_t response_packet;
-	write_packet_response(&response_packet, "test");
+
+	char* i = "{ \
+			\"version\": { \
+				\"name\": \"1.8.7\", \
+				\"protocol\": 47 \
+			}, \
+			\"players\": { \
+				\"max\": 100, \
+				\"online\": 5 \
+			}, \
+			\"description\": { \
+				\"text\": \"Hello world\" \
+			} \
+		}";
+
+	struct packet_t* response_packet = construct_clientbound_packet("Response", i);
+	server_send_packet(client, response_packet);
+
+	packet_free(response_packet);
 
 }
 static void sb_handle_ping(struct client_t *client, struct packet_t *packet)
 {
+
+	i64* p = malloc(sizeof(i64));
+
+	map_get(packet->map, "Payload", &p);
+
+
+
+
 
 }
 static void sb_handle_login_start(struct client_t *client, struct packet_t *packet)

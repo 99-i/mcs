@@ -30,6 +30,11 @@ int main()
 	uv_thread_join(&network_thread);
 
 	uv_mutex_destroy(&lock);
+
+	uv_loop_close(&main_loop);
+	uv_loop_close(&game_loop);
+	uv_loop_close(&network_loop);
+
 	return 0;
 }
 

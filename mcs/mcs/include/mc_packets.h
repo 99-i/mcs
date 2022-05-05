@@ -1,4 +1,5 @@
 #pragma once
+#undef uuid_t
 #include <stdint.h>
 #include "util.h"
 
@@ -19,7 +20,6 @@ enum efield_type
 	FT_LONG,
 	FT_CHAT,
 	FT_UUID,
-	FT_IDENTIFIER,
 	FT_BOOLEAN,
 	FT_DOUBLE,
 	FT_ANGLE,
@@ -28,14 +28,6 @@ enum efield_type
 	FT_POSITION,
 	FT_BYTE,
 	FT_FLOAT,
-	FT_STRING_16,
-	FT_STRING_20,
-	FT_STRING_40,
-	FT_STRING_255,
-	FT_STRING_256,
-	FT_STRING_384,
-	FT_STRING_32500,
-	FT_STRING_32767,
 	FT_STRING,
 	FT_VARLONG,
 	FT_CONDITIONAL,
@@ -116,6 +108,12 @@ struct packet_t
 	map_t map;
 };
 
+struct slabinfo_t
+{
+	size_t num_slabs;
+	struct slab_t* slabs;
+};
+extern struct slabinfo_t slabinfo;
 void construct_slabs(void);
 
 struct wraparound_t
@@ -128,78 +126,23 @@ bool should_wraparound(uint8_t *data, uint32_t data_size, struct wraparound_t *c
 
 bool create_serverbound_packet(uint32_t data_size, uint8_t *data, enum estate state, struct packet_t *packet);
 
-bool construct_packet_response(struct packet_t *packet, char *json_response);
-bool construct_packet_pong(struct packet_t *packet, int64_t payload);
-bool construct_packet_disconnect_login(struct packet_t *packet, char *reason);
-bool construct_packet_login_success(struct packet_t *packet, struct uuid_t uuid, char *username);
-bool construct_packet_set_compression(struct packet_t *packet, int32_t threshold);
-bool construct_packet_spawn_entity(struct packet_t *packet, int32_t entity_id, struct uuid_t object_uuid, int32_t type, double x, double y, double z, uint8_t pitch, uint8_t yaw, int32_t data, int16_t velocity_x, int16_t velocity_y, int16_t velocity_z);
-bool construct_packet_spawn_experience_orb(struct packet_t *packet, int32_t entity_id, double x, double y, double z, int16_t count);
-bool construct_packet_spawn_living_entity(struct packet_t *packet, int32_t entity_id, struct uuid_t entity_uuid, int32_t type, double x, double y, double z, uint8_t yaw, uint8_t pitch, uint8_t head_pitch, int16_t velocity_x, int16_t velocity_y, int16_t velocity_z);
-bool construct_packet_spawn_player(struct packet_t *packet, int32_t entity_id, struct uuid_t player_uuid, double x, double y, double z, uint8_t yaw, uint8_t pitch);
-bool construct_packet_entity_animation(struct packet_t *packet, int32_t entity_id, uint8_t animation);
-bool construct_packet_acknowledge_player_digging(struct packet_t *packet, struct position_t location, int32_t block, int32_t status, bool successful);
-bool construct_packet_block_break_animation(struct packet_t *packet, int32_t entity_id, struct position_t location, int8_t destroy_stage);
-bool construct_packet_block_action(struct packet_t *packet, struct position_t location, uint8_t action_id_(byte_1), uint8_t action_param_(byte_2), int32_t block_type);
-bool construct_packet_block_change(struct packet_t *packet, struct position_t location, int32_t block_id);
-bool construct_packet_server_difficulty(struct packet_t *packet, uint8_t difficulty, bool difficulty_locked);
-bool construct_packet_chat_message(struct packet_t *packet, char *json_data, int8_t position, struct uuid_t sender);
-bool construct_packet_window_confirmation(struct packet_t *packet, int8_t window_id, int16_t action_number, bool accepted);
-bool construct_packet_close_window(struct packet_t *packet, uint8_t window_id);
-bool construct_packet_window_property(struct packet_t *packet, uint8_t window_id, int16_t property, int16_t value);
-bool construct_packet_set_cooldown(struct packet_t *packet, int32_t item_id, int32_t cooldown_ticks);
-bool construct_packet_named_sound_effect(struct packet_t *packet, char *sound_name, int32_t sound_category, int32_t effect_position_x, int32_t effect_position_y, int32_t effect_position_z, float volume, float pitch);
-bool construct_packet_disconnect_play(struct packet_t *packet, char *reason);
-bool construct_packet_unload_chunk(struct packet_t *packet, int32_t chunk_x, int32_t chunk_z);
-bool construct_packet_change_game_state(struct packet_t *packet, uint8_t reason, float value);
-bool construct_packet_open_horse_window(struct packet_t *packet, int8_t window_id, int32_t number_of_slots, int32_t entity_id);
-bool construct_packet_keep_alive(struct packet_t *packet, int64_t keep_alive_id);
-bool construct_packet_effect(struct packet_t *packet, int32_t effect_id, struct position_t location, int32_t data, bool disable_relative_volume);
-bool construct_packet_entity_position(struct packet_t *packet, int32_t entity_id, int16_t delta_x, int16_t delta_y, int16_t delta_z, bool on_ground);
-bool construct_packet_entity_position_and_rotation(struct packet_t *packet, int32_t entity_id, int16_t delta_x, int16_t delta_y, int16_t delta_z, uint8_t yaw, uint8_t pitch, bool on_ground);
-bool construct_packet_entity_rotation(struct packet_t *packet, int32_t entity_id, uint8_t yaw, uint8_t pitch, bool on_ground);
-bool construct_packet_entity_movement(struct packet_t *packet, int32_t entity_id);
-bool construct_packet_vehicle_move(struct packet_t *packet, double x, double y, double z, float yaw, float pitch);
-bool construct_packet_open_book(struct packet_t *packet, int32_t hand);
-bool construct_packet_open_window(struct packet_t *packet, int32_t window_id, int32_t window_type, char *window_title);
-bool construct_packet_open_sign_editor(struct packet_t *packet, struct position_t location);
-bool construct_packet_craft_recipe_response(struct packet_t *packet, int8_t window_id, char *recipe);
-bool construct_packet_player_abilities(struct packet_t *packet, int8_t flags, float flying_speed, float field_of_view_modifier);
-bool construct_packet_player_position_and_look(struct packet_t *packet, double x, double y, double z, float yaw, float pitch, int8_t flags, int32_t teleport_id);
-bool construct_packet_remove_entity_effect(struct packet_t *packet, int32_t entity_id, int8_t effect_id);
-bool construct_packet_resource_pack_send(struct packet_t *packet, char *url, char *hash);
-bool construct_packet_entity_head_look(struct packet_t *packet, int32_t entity_id, uint8_t head_yaw);
-bool construct_packet_select_advancement_tab(struct packet_t *packet, bool has_id, char *optional_identifier);
-bool construct_packet_camera(struct packet_t *packet, int32_t camera_id);
-bool construct_packet_held_item_change(struct packet_t *packet, int8_t slot);
-bool construct_packet_update_view_position(struct packet_t *packet, int32_t chunk_x, int32_t chunk_z);
-bool construct_packet_update_view_distance(struct packet_t *packet, int32_t view_distance);
-bool construct_packet_spawn_position(struct packet_t *packet, struct position_t location);
-bool construct_packet_display_scoreboard(struct packet_t *packet, int8_t position, char *score_name);
-bool construct_packet_attach_entity(struct packet_t *packet, int32_t attached_entity_id, int32_t holding_entity_id);
-bool construct_packet_entity_velocity(struct packet_t *packet, int32_t entity_id, int16_t velocity_x, int16_t velocity_y, int16_t velocity_z);
-bool construct_packet_set_experience(struct packet_t *packet, float experience_bar, int32_t level, int32_t total_experience);
-bool construct_packet_update_health(struct packet_t *packet, float health, int32_t food, float food_saturation);
-bool construct_packet_time_update(struct packet_t *packet, int64_t world_age, int64_t time_of_day);
-bool construct_packet_entity_sound_effect(struct packet_t *packet, int32_t sound_id, int32_t sound_category, int32_t entity_id, float volume, float pitch);
-bool construct_packet_sound_effect(struct packet_t *packet, int32_t sound_id, int32_t sound_category, int32_t effect_position_x, int32_t effect_position_y, int32_t effect_position_z, float volume, float pitch);
-bool construct_packet_player_list_header_and_footer(struct packet_t *packet, char *header, char *footer);
-bool construct_packet_collect_item(struct packet_t *packet, int32_t collected_entity_id, int32_t collector_entity_id, int32_t pickup_item_count);
-bool construct_packet_entity_teleport(struct packet_t *packet, int32_t entity_id, double x, double y, double z, uint8_t yaw, uint8_t pitch, bool on_ground);
-bool construct_packet_entity_effect(struct packet_t *packet, int32_t entity_id, int8_t effect_id, int8_t amplifier, int32_t duration, int8_t flags);
+struct packet_t* construct_clientbound_packet(char* packet_type, ...);
 
-uint8_t *make_varint(int32_t varint, size_t *length);
-uint8_t *make_unsigned_short(uint16_t unsigned_short, size_t *length);
-uint8_t *make_unsigned_byte(uint8_t unsigned_byte, size_t *length);
-uint8_t *make_long(int64_t l, size_t *length);
-uint8_t *make_uuid(struct uuid_t uuid, size_t *length);
-uint8_t *make_boolean(bool boolean, size_t *length);
-uint8_t *make_double(double d, size_t *length);
-uint8_t *make_angle(uint8_t angle, size_t *length);
-uint8_t *make_int(int32_t integer, size_t *length);
-uint8_t *make_short(int16_t s, size_t *length);
-uint8_t *make_position(struct position_t pos, size_t *length);
-uint8_t *make_byte(int8_t byte, size_t *length);
-uint8_t *make_float(float f, size_t *length);
-uint8_t *make_string(const char *str, size_t *length);
-uint8_t *make_varlong(int64_t varlong, size_t *length);
+
+void packet_free(struct packet_t* packet);
+
+u8 *make_varint(i32 varint, size_t *length);
+u8 *make_u16(u16 unsigned_short, size_t *length);
+u8 *make_u8(u8 unsigned_byte, size_t *length);
+u8 *make_i64(i64 l, size_t *length);
+u8 *make_uuid(struct uuid_t uuid, size_t *length);
+u8 *make_boolean(bool boolean, size_t *length);
+u8 *make_double(double d, size_t *length);
+u8 *make_angle(u8 angle, size_t *length);
+u8 *make_i32(i32 integer, size_t *length);
+u8 *make_i16(i16 s, size_t *length);
+u8 *make_position(struct position_t pos, size_t *length);
+u8 *make_i8(i8 byte, size_t *length);
+u8 *make_float(float f, size_t *length);
+u8 *make_string(const char *str, size_t *length);
+u8 *make_varlong(i64 varlong, size_t *length);

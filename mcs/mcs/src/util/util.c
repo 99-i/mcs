@@ -34,9 +34,6 @@ typedef struct
 		char *name;
 		void *data;
 	}*fields;
-
-	uint32_t num_referenced_fields;
-	char **referenced_fields;
 } map;
 
 
@@ -48,8 +45,6 @@ map_t construct_map(void)
 	map *m = malloc(sizeof(map));
 	m->num_fields = 0;
 	m->fields = 0;
-	m->num_referenced_fields = 0;
-	m->referenced_fields = 0;
 	return m;
 }
 
@@ -93,11 +88,11 @@ struct map_field_t *map_get_field_by_key(map *pmap, char *key)
 }
 
 
-void map_set_raw(map_t pmap, char *key, void *value)
+void map_set(map_t pmap, char *key, void *value)
 {
 	map_get_field_by_key(pmap, key)->data = value;
 }
-bool map_get_raw(map_t pmap, char *key, void **dest)
+bool map_get(map_t pmap, char *key, void **dest)
 {
 	if (map_has_field(pmap, key))
 	{
@@ -110,333 +105,40 @@ bool map_get_raw(map_t pmap, char *key, void **dest)
 	}
 }
 
-void map_set_uint32(map_t pmap, char *key, uint32_t value)
-{
-	map_get_field_by_key(pmap, key)->data = value;
-}
-bool map_get_uint32(map_t pmap, char *key, uint32_t *dest)
-{
-	if (map_has_field(pmap, key))
-	{
-		*dest = map_get_field_by_key(pmap, key)->data;
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
-void map_set_uint8(map_t pmap, char *key, uint8_t value)
-{
-	map_get_field_by_key(pmap, key)->data = value;
-};
-bool map_get_uint8(map_t pmap, char *key, uint8_t *dest)
-{
-	if (map_has_field(pmap, key))
-	{
-		*dest = map_get_field_by_key(pmap, key)->data;
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-};
-
-void map_set_uint16(map_t pmap, char *key, uint16_t value)
-{
-	map_get_field_by_key(pmap, key)->data = value;
-};
-bool map_get_uint16(map_t pmap, char *key, uint16_t *dest)
-{
-	if (map_has_field(pmap, key))
-	{
-		*dest = map_get_field_by_key(pmap, key)->data;
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-};
-
-void map_set_int32(map_t pmap, char *key, int32_t value)
-{
-	map_get_field_by_key(pmap, key)->data = value;
-};
-bool map_get_int32(map_t pmap, char *key, int32_t *dest)
-{
-	if (map_has_field(pmap, key))
-	{
-		*dest = map_get_field_by_key(pmap, key)->data;
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-};
-
-void map_set_uint64(map_t pmap, char *key, uint64_t value)
-{
-	uint64_t *ptr = malloc(sizeof(uint64_t));
-	*ptr = value;
-	map_get_field_by_key(pmap, key)->data = ptr;
-	map *clearmap = (map *)pmap;
-	clearmap->num_referenced_fields += 1;
-	if (clearmap->num_referenced_fields == 1)
-	{
-		clearmap->referenced_fields = malloc(clearmap->num_referenced_fields * sizeof(char *));
-	}
-	else
-	{
-		clearmap->referenced_fields = realloc(clearmap->referenced_fields, clearmap->num_referenced_fields * sizeof(char *));
-	}
-	clearmap->referenced_fields[clearmap->num_referenced_fields - 1] = _strdup(key);
-}
-bool map_get_uint64(map_t pmap, char *key, uint64_t *dest)
-{
-	if (map_has_field(pmap, key))
-	{
-		*dest = *((uint64_t *)(map_get_field_by_key(pmap, key)->data));
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
-void map_set_int64(map_t pmap, char *key, int64_t value)
-{
-	int64_t *ptr = malloc(sizeof(int64_t));
-	*ptr = value;
-	map_get_field_by_key(pmap, key)->data = ptr;
-	map *clearmap = (map *)pmap;
-	clearmap->num_referenced_fields += 1;
-	if (clearmap->num_referenced_fields == 1)
-	{
-		clearmap->referenced_fields = malloc(clearmap->num_referenced_fields * sizeof(char *));
-	}
-	else
-	{
-		clearmap->referenced_fields = realloc(clearmap->referenced_fields, clearmap->num_referenced_fields * sizeof(char *));
-	}
-	clearmap->referenced_fields[clearmap->num_referenced_fields - 1] = _strdup(key);
-}
-bool map_get_int64(map_t pmap, char *key, int64_t *dest)
-{
-	if (map_has_field(pmap, key))
-	{
-		*dest = *((int64_t *)(map_get_field_by_key(pmap, key)->data));
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
-void map_set_uuid(map_t pmap, char *key, struct uuid_t value)
-{
-	struct uuid_t *ptr = malloc(sizeof(struct uuid_t));
-	*ptr = value;
-	map_get_field_by_key(pmap, key)->data = ptr;
-	map *clearmap = (map *)pmap;
-	clearmap->num_referenced_fields += 1;
-	if (clearmap->num_referenced_fields == 1)
-	{
-		clearmap->referenced_fields = malloc(clearmap->num_referenced_fields * sizeof(char *));
-	}
-	else
-	{
-		clearmap->referenced_fields = realloc(clearmap->referenced_fields, clearmap->num_referenced_fields * sizeof(char *));
-	}
-	clearmap->referenced_fields[clearmap->num_referenced_fields - 1] = _strdup(key);
-}
-bool map_get_uuid(map_t pmap, char *key, struct uuid_t *dest)
-{
-	if (map_has_field(pmap, key))
-	{
-		*dest = *((struct uuid_t *)(map_get_field_by_key(pmap, key)->data));
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
-void map_set_position(map_t pmap, char *key, struct position_t value)
-{
-	struct position_t *ptr = malloc(sizeof(struct position_t));
-	*ptr = value;
-	map_get_field_by_key(pmap, key)->data = ptr;
-	map *clearmap = (map *)pmap;
-	clearmap->num_referenced_fields += 1;
-	if (clearmap->num_referenced_fields == 1)
-	{
-		clearmap->referenced_fields = malloc(clearmap->num_referenced_fields * sizeof(char *));
-	}
-	else
-	{
-		clearmap->referenced_fields = realloc(clearmap->referenced_fields, clearmap->num_referenced_fields * sizeof(char *));
-	}
-	clearmap->referenced_fields[clearmap->num_referenced_fields - 1] = _strdup(key);
-}
-bool map_get_position(map_t pmap, char *key, struct position_t *dest)
-{
-	if (map_has_field(pmap, key))
-	{
-		*dest = *((struct position_t *)(map_get_field_by_key(pmap, key)->data));
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
-void map_set_double(map_t pmap, char *key, double value)
-{
-	double *ptr = malloc(sizeof(double));
-	*ptr = value;
-	map_get_field_by_key(pmap, key)->data = ptr;
-	map *clearmap = (map *)pmap;
-	clearmap->num_referenced_fields += 1;
-	if (clearmap->num_referenced_fields == 1)
-	{
-		clearmap->referenced_fields = malloc(clearmap->num_referenced_fields * sizeof(char *));
-	}
-	else
-	{
-		clearmap->referenced_fields = realloc(clearmap->referenced_fields, clearmap->num_referenced_fields * sizeof(char *));
-	}
-	clearmap->referenced_fields[clearmap->num_referenced_fields - 1] = _strdup(key);
-}
-bool map_get_double(map_t pmap, char *key, double *dest)
-{
-	if (map_has_field(pmap, key))
-	{
-		*dest = *((double *)(map_get_field_by_key(pmap, key)->data));
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
-void map_set_boolean(map_t pmap, char *key, bool value)
-{
-	map_get_field_by_key(pmap, key)->data = value;
-};
-bool map_get_boolean(map_t pmap, char *key, bool *dest)
-{
-	if (map_has_field(pmap, key))
-	{
-		*dest = map_get_field_by_key(pmap, key)->data;
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-};
-
-void map_set_int16(map_t pmap, char *key, int16_t value)
-{
-	map_get_field_by_key(pmap, key)->data = value;
-};
-bool map_get_int16(map_t pmap, char *key, int16_t *dest)
-{
-	if (map_has_field(pmap, key))
-	{
-		*dest = map_get_field_by_key(pmap, key)->data;
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-};
-
-bool map_get_int8(map_t pmap, char *key, int8_t *dest)
-{
-	if (map_has_field(pmap, key))
-	{
-		*dest = map_get_field_by_key(pmap, key)->data;
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
-void map_set_int8(map_t pmap, char *key, int8_t value)
-{
-	map_get_field_by_key(pmap, key)->data = value;
-}
-
-void map_set_float(map_t pmap, char *key, float flt)
-{
-	map_get_field_by_key(pmap, key)->data = *(int32_t *)&flt;
-}
-
-bool map_get_float(map_t pmap, char *key, float *dest)
-{
-	if (map_has_field(pmap, key))
-	{
-		*dest = *(float *)map_get_field_by_key(pmap, key);
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-
-void map_set_string(map_t pmap, char *key, char *string)
-{
-	if (string != 0)
-	{
-		map_get_field_by_key(pmap, key)->data = _strdup(string);
-	}
-}
-
-bool map_get_string(map_t pmap, char *key, char **dest)
-{
-	if (map_has_field(pmap, key))
-	{
-		*dest = _strdup(map_get_field_by_key(pmap, key)->data);
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
 
 void map_free(map_t pmap)
 {
 	map *map = pmap;
 	size_t i;
 
-	for (i = 0; i < map->num_referenced_fields; i++)
-	{
-		free(map_get_field_by_key(pmap, map->referenced_fields[i])->data);
-		free(map->referenced_fields[i]);
-	}
-
 	for (i = 0; i < map->num_fields; i++)
 	{
-		free(map->fields[i].name);
+		map_destroy(pmap, map->fields[i].name);
 	}
 
 	free(pmap);
 }
+
+void map_destroy(map_t pmap, char* key)
+{
+	size_t i;
+	struct map_field_t* field;
+	map* real = (map*)pmap;
+	if (map_has_field(pmap, key))
+	{
+		field = map_get_field_by_key(pmap, key);
+		free(field->name);
+		for (i = (field - real->fields); i < real->num_fields - 1; i++)
+		{
+			real->fields[i] = real->fields[i + 1];
+		}
+		real->num_fields--;
+		real->fields = realloc(real->fields, sizeof(struct map_field_t) * real->num_fields);
+	}
+
+}
+
+
 #pragma endregion
 
 #pragma region Buffer
@@ -445,7 +147,6 @@ typedef struct
 {
 	uint8_t *data;
 	size_t data_length;
-	size_t capacity;
 } buffer;
 
 
@@ -471,38 +172,29 @@ void buffer_append(buffer_t buf, uint8_t *data, size_t size)
 	size_t original_length;
 
 	if (size == 0) return;
-	if (b->capacity == 0)
-	{
-		b->data = malloc(sizeof(uint8_t *) * 1);
-		b->capacity = 1;
-		b->data_length = 0;
-	}
 
-	if (b->capacity - b->data_length < size)
-	{
-		b->data = realloc(b->data, b->data_length + size + 10);
-		b->capacity = b->data_length + size;
-	}
-
-	dest = b->data_length + size;
 	original_length = b->data_length;
-	for (i = b->data_length; i < dest; i++)
+	b->data_length += size;
+	if (!b->data)
+	{
+		b->data = malloc(b->data_length);
+	}
+	else
+	{
+		b->data = realloc(b->data, sizeof(uint8_t) * (b->data_length));
+	}
+
+	for (size_t i = original_length; i < b->data_length; i++)
 	{
 		b->data[i] = data[i - original_length];
-		b->data_length++;
 	}
+
 }
 
 void buffer_append_byte(buffer_t buf, uint8_t byte)
 {
 	buffer *b = (buffer *)buf;
-	if (!b->data)
-	{
-		b->data = malloc(sizeof(uint8_t));
-		b->capacity = 1;
-		b->data_length = 0;
-	}
-	b->data[b->data_length] = byte;
+	buffer_append(buf, &byte, 1);
 }
 
 void buffer_clear(buffer_t buf)
@@ -514,7 +206,6 @@ void buffer_clear(buffer_t buf)
 		free(b->data);
 	}
 	b->data = 0;
-	b->capacity = 0;
 	b->data_length = 0;
 }
 
@@ -525,7 +216,7 @@ uint8_t *buffer_get(buffer_t buf, size_t *length)
 
 	*length = b->data_length;
 	arr = malloc(sizeof(uint8_t) * b->data_length);
-
+	memcpy(arr, b->data, sizeof(uint8_t) * b->data_length);
 	return arr;
 }
 
