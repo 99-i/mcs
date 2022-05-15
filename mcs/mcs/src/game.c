@@ -54,6 +54,7 @@ static void sb_handle_spectate(struct client_t *client, struct packet_t *packet)
 static void sb_handle_player_block_placement(struct client_t *client, struct packet_t *packet);
 static void sb_handle_use_item(struct client_t *client, struct packet_t *packet);
 #pragma endregion
+
 static void timer_callback(uv_timer_t *handle)
 {
 	assert(handle == &timer);
@@ -67,7 +68,7 @@ void init_game_loop(void)
 {
 	uv_loop_init(&game_loop);
 	uv_timer_init(&game_loop, &timer);
-	uv_timer_start(&timer, timer_callback, 0, 1000 / 40);
+	uv_timer_start(&timer, timer_callback, 0, 1000 / 20);
 }
 
 void run_game_loop(void *data)
@@ -83,16 +84,7 @@ struct client_t *game_init_client(uv_tcp_t *socket)
 	client->socket = socket;
 	client->state = STATE_HANDSHAKING;
 	client->player = 0;
-	game->server->client_count += 1;
-	if (game->server->client_count == 1)
-	{
-		game->server->clients = malloc(sizeof(struct client_t));
-	}
-	else
-	{
-		game->server->clients = realloc(game->server->clients, sizeof(struct client_t) * game->server->client_count);
-	}
-	game->server->clients[game->server->client_count - 1] = client;
+	client_array_append(&game->server->clients, client);
 	uv_mutex_unlock(&lock);
 	return client;
 }
@@ -102,11 +94,11 @@ struct client_t *game_get_client(uv_tcp_t *socket)
 	uint32_t i;
 
 	uv_mutex_lock(&lock);
-	for (i = 0; i < game->server->client_count; i++)
+	for (i = 0; i < game->server->clients.size; i++)
 	{
-		if (game->server->clients[i]->socket == socket)
+		if (game->server->clients.fields[i]->socket == socket)
 		{
-			return game->server->clients[i];
+			return game->server->clients.fields[i];
 		}
 	}
 	uv_mutex_unlock(&lock);
@@ -314,25 +306,26 @@ void game_handle_client_disconnect(uv_tcp_t *client)
 	size_t i;
 
 	uv_mutex_lock(&lock);
-	for (i = 0; i < game->server->client_count; i++)
+	for (i = 0; i < game->server->clients.size; i++)
 	{
-		if (game->server->clients[i]->socket == client)
+		if (game->server->clients.fields[i]->socket == client)
 		{
-			removed_client = game->server->clients[i];
+			removed_client = game->server->clients.fields[i];
+			break;
 		}
 	}
-	i--;
-
+	assert(removed_client != 0);
 	assert(client != 0);
 
 	uv_close(client, NULL);
-
-
 	free(client);
 
-	memmove(game->server->clients + i, game->server->clients + i + 1, (--game->server->client_count - i) * sizeof(struct client_t *));
-
-
+	client_array_remove(&game->server->clients, i);
+	if (removed_client->player)
+	{
+		free(removed_client->player);
+	}
+	free(removed_client);
 	uv_mutex_unlock(&lock);
 }
 

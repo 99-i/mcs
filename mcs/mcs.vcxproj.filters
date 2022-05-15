@@ -30,13 +30,25 @@
     <ClCompile Include="mcs\src\mc_packets\mc_packets.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mcs\src\util\util.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="mcs\src\cjson\cjson.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="mcs\src\mcs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mcs\src\util\string.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mcs\src\util\buf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mcs\src\util\client_array.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mcs\src\util\slab_field_array.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mcs\src\util\world_array.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,16 +59,46 @@
     <ClInclude Include="mcs\include\mc_packets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mcs\include\util.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="mcs\include\cjson.h">
+    <ClInclude Include="mcs\include\cjson\cjson.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="mcs\include\game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="mcs\include\server.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mcs\include\util\slab_field_array.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mcs\include\util\map.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mcs\include\util\string.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mcs\include\util\def.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mcs\include\util\buf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mcs\include\util\slab_array.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mcs\include\util\world_array.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mcs\include\util\template\array.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mcs\include\util\client_array.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mcs\src\util\map.c">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mcs\src\util\slab_array.c">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

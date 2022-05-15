@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <uv.h>
 #include "game.h"
+#include "util/world_array.h"
+#include "util/client_array.h"
 
 extern uv_mutex_t lock;
 struct world_t;
@@ -32,8 +34,8 @@ struct client_t
 
 struct entity_player_t
 {
-	char username[16];
-	char display_name[32];
+	str username;
+	str display_name;
 	vector3f location;
 	vector3f velocity;
 	vector3f acceleration;
@@ -41,28 +43,23 @@ struct entity_player_t
 
 struct server_t
 {
-	uint32_t client_count;
-	struct client_t **clients;
+	client_array clients;
 };
 struct server_t *construct_server(void);
 struct game_t
 {
 	struct server_t *server;
-	uint32_t world_count;
-	struct world_t *worlds;
+	world_array worlds;
 	uint32_t tick_count;
 };
 
 
 
-extern uv_loop_t main_loop;
 extern uv_loop_t game_loop;
 extern uv_loop_t network_loop;
 
 extern struct game_t *game;
 
-void init_main_loop(void);
-void run_main_loop(void *data);
 
 void init_network_loop(void);
 void run_network_loop(void *data);

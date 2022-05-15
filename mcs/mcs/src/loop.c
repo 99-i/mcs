@@ -1,6 +1,7 @@
 #include "mcs.h"
 #include <stdio.h>
 #include <assert.h>
+#include "util/string.h"
 
 uv_loop_t main_loop;
 
