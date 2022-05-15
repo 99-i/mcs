@@ -8,6 +8,7 @@
 #include <assert.h>
 #include "mcs.h"
 #include "util/buf.h"
+#include "types.h"
 
 #undef uuid_t
 #define READY_SLICED_BUFFER() buf_destroy(&sliced); \
@@ -74,7 +75,7 @@ void construct_slabs(void)
 		slab.direction = bound_to_to_direction(cJSON_GetObjectItem(current_slab, "boundTo")->valuestring);
 		slab.state = state_str_to_state(cJSON_GetObjectItem(current_slab, "state")->valuestring);
 		slab.id = cJSON_GetObjectItem(current_slab, "id")->valueint;
-		slab.name = cJSON_GetObjectItem(current_slab, "name")->valuestring;
+		slab.name = str_construct_from_cstr(cJSON_GetObjectItem(current_slab, "name")->valuestring);
 
 		fields = cJSON_GetObjectItem(current_slab, "fields");
 
@@ -84,7 +85,7 @@ void construct_slabs(void)
 
 		for (j = 0; j < num_fields; j++)
 		{
-			field.field_name = cJSON_GetObjectItem(cJSON_GetArrayItem(fields, j), "fieldName")->valuestring;
+			field.field_name = str_construct_from_cstr(cJSON_GetObjectItem(cJSON_GetArrayItem(fields, j), "fieldName")->valuestring);
 			field.type = field_str_to_field_type(cJSON_GetObjectItem(cJSON_GetArrayItem(fields, j), "fieldType")->valuestring);
 			slab_field_array_append(&slab.fields, field);
 		}
@@ -251,7 +252,7 @@ bool should_wraparound(buf b, struct wraparound_t *cutoff)
 
 	return false;
 }
-bool create_serverbound_packet(buf b, enum estate state, struct packet_t *packet)
+/*bool create_serverbound_packet(buf b, enum estate state, struct packet_t* packet)
 {
 	size_t i;
 	size_t j;
@@ -375,7 +376,7 @@ bool create_serverbound_packet(buf b, enum estate state, struct packet_t *packet
 		}
 	}
 	return found_slab;
-}
+} */
 static uint8_t read_varint(buf b, int32_t *dest)
 {
 	int32_t decoded_int = 0;
@@ -616,7 +617,7 @@ static uint8_t read_varlong(buf b, int64_t *dest)
 	}
 	return len;
 }
-struct packet_t* construct_clientbound_packet(str packet_type, ...)
+/*struct packet_t* construct_clientbound_packet(str packet_type, ...)
 {
 	struct packet_t* packet = malloc(sizeof(struct packet_t));
 	struct slab_t* current_slab = 0;
@@ -632,7 +633,7 @@ struct packet_t* construct_clientbound_packet(str packet_type, ...)
 
 	for (i = 0; i < slabinfo.slabs.size; i++)
 	{
-		if (!strcmp(packet_type, slabinfo.slabs.fields[i].name))
+		if (!streq_str(packet_type, slabinfo.slabs.fields[i].name))
 		{
 			current_slab = &slabinfo.slabs.fields[i];
 		}
@@ -696,7 +697,7 @@ struct packet_t* construct_clientbound_packet(str packet_type, ...)
 	va_end(argp);
 
 	return packet;
-}
+} */
 void packet_free(struct packet_t* packet)
 {
 

@@ -8,7 +8,7 @@
 #define ARRAY_NAME slab_field
 #define ARRAY_DEFINITIONS
 
-#include "template/array.h"
+#include "template/array.inc"
 
 #undef ARRAY_DEFINITIONS
 

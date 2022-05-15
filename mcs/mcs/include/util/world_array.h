@@ -8,6 +8,6 @@
 #define ARRAY_NAME world
 #define ARRAY_DEFINITIONS
 
-#include "template/array.h"
+#include "template/array.inc"
 
 #undef ARRAY_DEFINITIONS

@@ -38,6 +38,7 @@
     <ClInclude Include="mcs\include\mcs.h" />
     <ClInclude Include="mcs\include\mc_packets.h" />
     <ClInclude Include="mcs\include\server.h" />
+    <ClInclude Include="mcs\include\types.h" />
     <ClInclude Include="mcs\include\util\buf.h" />
     <ClInclude Include="mcs\include\util\client_array.h" />
     <ClInclude Include="mcs\include\util\def.h" />
@@ -45,7 +46,7 @@
     <ClInclude Include="mcs\include\util\slab_array.h" />
     <ClInclude Include="mcs\include\util\slab_field_array.h" />
     <ClInclude Include="mcs\include\util\string.h" />
-    <ClInclude Include="mcs\include\util\template\array.h" />
+    <ClInclude Include="mcs\include\util\template\array.inc" />
     <ClInclude Include="mcs\include\util\world_array.h" />
     <ClInclude Include="mcs\src\util\map.c" />
     <ClInclude Include="mcs\src\util\slab_array.c" />

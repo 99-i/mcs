@@ -2,7 +2,7 @@
 
 #include "util/string.h"
 #include "util/def.h"
-
+#undef uuid_t
 enum emap_type
 {
 	MAPTYPE_I8,
@@ -39,7 +39,6 @@ typedef struct map_value
 		str str;
 	};
 } map_value;
-void map_destroy_value(map_value* value);
 
 map_value mv_i8(i8 i8);
 map_value mv_i16(i16 i16);

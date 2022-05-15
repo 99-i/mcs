@@ -1,4 +1,5 @@
 #include "mcs.h"
+#include "types.h"
 
 struct server_t *construct_server(void)
 {
