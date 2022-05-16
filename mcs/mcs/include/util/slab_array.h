@@ -6,7 +6,7 @@
 struct slab_t
 {
 	str name;
-	u32 id;
+	i32 id;
 	enum estate state;
 	enum epacket_direction direction;
 	slab_field_array fields;

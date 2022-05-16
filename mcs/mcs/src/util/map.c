@@ -107,7 +107,7 @@ map_value mv_pos(struct position_t pos)
 
 typedef struct
 {
-	size_t fields_size;
+	i32 fields_size;
 	struct map_field
 	{
 		str key;
@@ -127,7 +127,7 @@ map map_construct()
 void map_set(map m, str s, map_value mv)
 {
 	map_t* real = (map_t*)m;
-	size_t i;
+	i32 i;
 	for (i = 0; i < real->fields_size; i++)
 	{
 		if (streq_str(real->fields[i].key, s))
@@ -145,7 +145,7 @@ void map_set(map m, str s, map_value mv)
 	else
 	{
 		real->fields_size += 1;
-		real->fields = mcsrealloc(real->fields, ((u32)sizeof(struct map_field)) * real->fields_size);
+		real->fields = mcsrealloc(real->fields, ((u64)sizeof(struct map_field)) * real->fields_size);
 		real->fields[real->fields_size - 1].key = str_clone_str(s);
 	}
 
@@ -155,7 +155,7 @@ void map_set(map m, str s, map_value mv)
 map_value map_get_str(map m, str s)
 {
 	map_t* real = (map_t*)m;
-	size_t i;
+	i32 i;
 	for (i = 0; i < real->fields_size; i++)
 	{
 		if (streq_str(real->fields[i].key, s))
@@ -169,7 +169,7 @@ map_value map_get_str(map m, str s)
 map_value map_get_cstr(map m, const char* s)
 {
 	map_t* real = (map_t*)m;
-	size_t i;
+	i32 i;
 	for (i = 0; i < real->fields_size; i++)
 	{
 		if (streq_cstr(real->fields[i].key, s))
@@ -182,7 +182,7 @@ map_value map_get_cstr(map m, const char* s)
 void map_destroy(map m)
 {
 	map_t* real = (map_t*)m;
-	size_t i;
+	i32 i;
 	for (i = 0; i < real->fields_size; i++)
 	{
 		str_destroy(&real->fields[i].key);

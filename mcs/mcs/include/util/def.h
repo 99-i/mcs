@@ -13,5 +13,5 @@ typedef int16_t		i16;
 typedef int32_t		i32;
 typedef int64_t		i64;
 
-void* mcsalloc(u64 s);
-void *mcsrealloc(void *block, u64 s);
+void* mcsalloc(i32 s);
+void *mcsrealloc(void *block, i32 s);

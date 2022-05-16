@@ -8,19 +8,19 @@
 #ifdef ARRAY_DEFINITIONS
 typedef struct ARRAY_STRUCT_NAME
 {
-	size_t capacity;
-	size_t size;
+	i32 capacity;
+	i32 size;
 	ARRAY_TYPE *fields;
 } ARRAY_STRUCT_NAME;
 
-ARRAY_STRUCT_NAME CAT(ARRAY_STRUCT_NAME, _construct)(size_t size);
+ARRAY_STRUCT_NAME CAT(ARRAY_STRUCT_NAME, _construct)(i32 size);
 void CAT(ARRAY_STRUCT_NAME, _append)(ARRAY_STRUCT_NAME *array, ARRAY_TYPE field);
 void CAT(ARRAY_STRUCT_NAME, _destroy)(ARRAY_STRUCT_NAME *array);
-void CAT(ARRAY_STRUCT_NAME, _remove)(ARRAY_STRUCT_NAME *array, size_t index);
+void CAT(ARRAY_STRUCT_NAME, _remove)(ARRAY_STRUCT_NAME *array, i32 index);
 #else 
 
 #ifdef ARRAY_IMPLEMENTATION
-ARRAY_STRUCT_NAME CAT(ARRAY_STRUCT_NAME, _construct)(size_t size)
+ARRAY_STRUCT_NAME CAT(ARRAY_STRUCT_NAME, _construct)(i32 size)
 {
 	ARRAY_STRUCT_NAME array;
 	array.capacity = size;
@@ -39,7 +39,7 @@ void CAT(ARRAY_STRUCT_NAME, _append)(ARRAY_STRUCT_NAME* array, ARRAY_TYPE field)
 		}
 		else
 		{
-			array->fields = realloc(array->fields, array->size * sizeof(ARRAY_TYPE));
+			array->fields = mcsrealloc(array->fields, array->size * sizeof(ARRAY_TYPE));
 		}
 	}
 	array->fields[array->size] = field;
@@ -53,7 +53,7 @@ void CAT(ARRAY_STRUCT_NAME, _destroy)(ARRAY_STRUCT_NAME* array)
 	array->fields = 0;
 }
 
-void CAT(ARRAY_STRUCT_NAME, _remove)(ARRAY_STRUCT_NAME* array, size_t index)
+void CAT(ARRAY_STRUCT_NAME, _remove)(ARRAY_STRUCT_NAME* array, i32 index)
 {
 
 	memmove(array->fields + index, array->fields + index + 1, (array->size - 1 - index) * sizeof(ARRAY_TYPE));

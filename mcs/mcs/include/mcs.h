@@ -9,8 +9,6 @@
 extern uv_mutex_t lock;
 struct server_t *construct_server(void);
 
-
-
 extern uv_loop_t game_loop;
 extern uv_loop_t network_loop;
 

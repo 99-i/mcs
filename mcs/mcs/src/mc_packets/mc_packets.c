@@ -16,25 +16,25 @@
 sliced = buf_slice_from_buf(b, data_needle, b.size)
 
 struct slabinfo_t slabinfo;
-static u8 read_varint(buf b, i32 *dest);
-static u8 read_u16(buf b, u16 *dest);
-static u8 read_u8(buf b, u8 *dest);
-static u8 read_i64(buf b, i64 *dest);
-static u8 read_u64(buf b, u64 *dest);
-static u8 read_uuid(buf b, struct uuid_t *dest);
-static u8 read_bool(buf b, bool *dest);
-static u8 read_double(buf b, double *dest);
-static u8 read_i32(buf b, i32 *dest);
-static u8 read_i16(buf b, i16 *dest);
-static u8 read_position(buf b, struct position_t *dest);
-static u8 read_i8(buf b, i8 *dest);
-static u8 read_float(buf b, float *dest);
-static u8 read_str(buf b, str *dest);
-static u8 read_varlong(buf b, i64 *dest);
+static i32 read_varint(buf b, i32 *dest);
+static i32 read_u16(buf b, i32 *dest);
+static i32 read_u8(buf b, i32 *dest);
+static i32 read_i64(buf b, i64 *dest);
+static i32 read_u64(buf b, u64 *dest);
+static i32 read_uuid(buf b, struct uuid_t *dest);
+static i32 read_bool(buf b, bool *dest);
+static i32 read_double(buf b, double *dest);
+static i32 read_i32(buf b, i32 *dest);
+static i32 read_i16(buf b, i32 *dest);
+static i32 read_position(buf b, struct position_t *dest);
+static i32 read_i8(buf b, i32 *dest);
+static i32 read_float(buf b, float *dest);
+static i32 read_str(buf b, str *dest);
+static i32 read_varlong(buf b, i64 *dest);
 
 struct packet_metadata_t get_packet_metadata(buf b)
 {
-	u8 bytes = 0;
+	i32 bytes = 0;
 	buf id_sliced_buf;
 	i32 id;
 	i32 length;
@@ -45,7 +45,7 @@ struct packet_metadata_t get_packet_metadata(buf b)
 
 	return (struct packet_metadata_t)
 	{
-		(u8)id, (u16)length
+		(i32)id, (i32)length
 	};
 }
 enum epacket_direction bound_to_to_direction(char *str);
@@ -245,7 +245,7 @@ enum efield_type field_str_to_field_type(char *str)
 bool should_wraparound(buf b, struct wraparound_t *cutoff)
 {
 	i32 length;
-	i8 length_size;
+	i32 length_size;
 	length_size = read_varint(b, &length);
 
 	if (b.size - length_size > length)
@@ -260,29 +260,24 @@ bool should_wraparound(buf b, struct wraparound_t *cutoff)
 }
 bool create_serverbound_packet(buf b, enum estate state, struct packet_t* packet)
 {
-	size_t i;
-	size_t j;
+	i32 i;
+	i32 j;
 	buf sliced;
 	struct packet_metadata_t metadata = get_packet_metadata(b);
 	bool found_slab = false;
-	u32 data_needle = 0;
+	i32 data_needle = 0;
 	data_needle += read_varint(b, 0);
 	sliced = buf_slice_from_buf(b, data_needle, b.size);
 	data_needle += read_varint(sliced, 0);
 
 
-	str the_string;
-	u16 the_unsigned_short;
-	u8 the_unsigned_byte;
-	i64 the_long;
-	struct uuid_t the_uuid;
-	bool the_boolean;
-	double the_double;
-	i32 the_int;
-	i16 the_short;
-	struct position_t the_position;
-	i8 the_byte;
-	float the_float;
+	str string;
+	i64 num;
+	struct uuid_t uuid;
+	bool the_bool;
+	double d;
+	struct position_t pos;
+	float f;
 
 	for (i = 0; i < slabinfo.slabs.size; i++)
 	{
@@ -300,78 +295,78 @@ bool create_serverbound_packet(buf b, enum estate state, struct packet_t* packet
 				{
 					case FT_VARINT:
 						READY_SLICED_BUFFER();
-						data_needle += read_varint(sliced, &the_int);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_i32(the_int));
+						data_needle += read_varint(sliced, (i32*) &num);
+						map_set(packet->map, slab->fields.fields[j].field_name, mv_i32((i32) num));
 						break;
 					case FT_UNSIGNED_SHORT:
 						READY_SLICED_BUFFER();
-						data_needle += read_u16(sliced, &the_unsigned_short);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_u16(the_unsigned_short));
+						data_needle += read_u16(sliced, (i32*) &num);
+						map_set(packet->map, slab->fields.fields[j].field_name, mv_u16((u16) num));
 						break;
 					case FT_UNSIGNED_BYTE:
 						READY_SLICED_BUFFER();
-						data_needle += read_u8(sliced, &the_unsigned_byte);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_u8(the_unsigned_byte));
+						data_needle += read_u8(sliced, (i32*) &num);
+						map_set(packet->map, slab->fields.fields[j].field_name, mv_u8((u8) num));
 						break;
 					case FT_LONG:
 						READY_SLICED_BUFFER();
-						data_needle += read_i64(sliced, &the_long);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_i64(the_long));
+						data_needle += read_i64(sliced, &num);
+						map_set(packet->map, slab->fields.fields[j].field_name, mv_i64(num));
 						break;
 					case FT_UUID:
 						READY_SLICED_BUFFER();
-						data_needle += read_uuid(sliced, &the_uuid);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_uuid(the_uuid));
+						data_needle += read_uuid(sliced, &uuid);
+						map_set(packet->map, slab->fields.fields[j].field_name, mv_uuid(uuid));
 						break;
 					case FT_BOOLEAN:
 						READY_SLICED_BUFFER();
-						data_needle += read_bool(sliced, &the_boolean);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_u8(the_boolean));
+						data_needle += read_bool(sliced, &the_bool);
+						map_set(packet->map, slab->fields.fields[j].field_name, mv_u8(the_bool));
 						break;
 					case FT_DOUBLE:
 						READY_SLICED_BUFFER();
-						data_needle += read_double(sliced, &the_double);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_double(the_double));
+						data_needle += read_double(sliced, &d);
+						map_set(packet->map, slab->fields.fields[j].field_name, mv_double(d));
 						break;
 					case FT_ANGLE:
 						READY_SLICED_BUFFER();
-						data_needle += read_u8(sliced, &the_unsigned_byte);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_u8(the_unsigned_byte));
+						data_needle += read_u8(sliced, (i32*) &num);
+						map_set(packet->map, slab->fields.fields[j].field_name, mv_u8((u8) num));
 						break;
 					case FT_INT:
 						READY_SLICED_BUFFER();
-						data_needle += read_i32(sliced, &the_int);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_i32(the_int));
+						data_needle += read_i32(sliced, (i32*) &num);
+						map_set(packet->map, slab->fields.fields[j].field_name, mv_i32((i32) num));
 						break;
 					case FT_SHORT:
 						READY_SLICED_BUFFER();
-						data_needle += read_i16(sliced, &the_short);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_i16(the_short));
+						data_needle += read_i16(sliced, (i32*) &num);
+						map_set(packet->map, slab->fields.fields[j].field_name, mv_i16((i16) num));
 						break;
 					case FT_POSITION:
 						READY_SLICED_BUFFER();
-						data_needle += read_position(sliced, &the_position);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_pos(the_position));
+						data_needle += read_position(sliced, &pos);
+						map_set(packet->map, slab->fields.fields[j].field_name, mv_pos(pos));
 						break;
 					case FT_BYTE:
 						READY_SLICED_BUFFER();
-						data_needle += read_i8(sliced, &the_byte);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_i8(the_byte));
+						data_needle += read_i8(sliced, (i32*) &num);
+						map_set(packet->map, slab->fields.fields[j].field_name, mv_i8((i8) num));
 						break;
 					case FT_FLOAT:
 						READY_SLICED_BUFFER();
-						data_needle += read_float(sliced, &the_float);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_float(the_float));
+						data_needle += read_float(sliced, &f);
+						map_set(packet->map, slab->fields.fields[j].field_name, mv_float(f));
 						break;
 					case FT_STRING:
 						READY_SLICED_BUFFER();
-						data_needle += read_str(sliced, &the_string);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_str(the_string));
+						data_needle += read_str(sliced, &string);
+						map_set(packet->map, slab->fields.fields[j].field_name, mv_str(string));
 						break;
 					case FT_VARLONG:
 						READY_SLICED_BUFFER();
-						data_needle += read_varlong(sliced, &the_long);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_i64(the_long));
+						data_needle += read_varlong(sliced, &num);
+						map_set(packet->map, slab->fields.fields[j].field_name, mv_i64(num));
 						break;
 					default:
 						break;
@@ -383,12 +378,12 @@ bool create_serverbound_packet(buf b, enum estate state, struct packet_t* packet
 	}
 	return found_slab;
 }
-static u8 read_varint(buf b, i32 *dest)
+static i32 read_varint(buf b, i32 *dest)
 {
 	i32 decoded_int = 0;
 	i32 bit_offset = 0;
-	u8 current_byte = 0;
-	u8 len = 0;
+	i32 current_byte = 0;
+	i32 len = 0;
 
 	do
 	{
@@ -411,7 +406,7 @@ static u8 read_varint(buf b, i32 *dest)
 	}
 	return len;
 }
-static u8 read_u16(buf b, u16 *dest)
+static i32 read_u16(buf b, i32 *dest)
 {
 	if (b.size < 2)
 	{
@@ -421,7 +416,7 @@ static u8 read_u16(buf b, u16 *dest)
 	*dest = (b.data[0] << 8) | b.data[1];
 	return 2;
 }
-static u8 read_u8(buf b, u8 *dest)
+static i32 read_u8(buf b, i32 *dest)
 {
 	if (b.size < 1)
 	{
@@ -430,7 +425,7 @@ static u8 read_u8(buf b, u8 *dest)
 	*dest = b.data[0];
 	return 1;
 }
-static u8 read_i64(buf b, i64 *dest)
+static i32 read_i64(buf b, i64 *dest)
 {
 	if (b.size < 8)
 	{
@@ -447,7 +442,7 @@ static u8 read_i64(buf b, i64 *dest)
 			(((u64)b.data[7]) << 0);
 	return 8;
 }
-static u8 read_uuid(buf b, struct uuid_t *dest)
+static i32 read_uuid(buf b, struct uuid_t *dest)
 {
 	u64 high;
 	u64 low;
@@ -456,15 +451,13 @@ static u8 read_uuid(buf b, struct uuid_t *dest)
 	{
 		return 0;
 	}
-	high = read_u64(b, &high);
-	sliced = buf_slice_from_buf(b, high, b.size);
-	low = read_u64(sliced, &low);
-
+	sliced = buf_slice_from_buf(b, read_u64(b, &high), b.size);
+	read_u64(sliced, &low);
 	dest->high = high;
 	dest->low = low;
 	return 16;
 }
-static u8 read_bool(buf b, bool *dest)
+static i32 read_bool(buf b, bool *dest)
 {
 	if (b.size < 1)
 	{
@@ -476,7 +469,7 @@ static u8 read_bool(buf b, bool *dest)
 	}
 	return 1;
 }
-static u8 read_double(buf b, double *dest)
+static i32 read_double(buf b, double *dest)
 {
 	u64 holder;
 	if (b.size < 8)
@@ -491,7 +484,7 @@ static u8 read_double(buf b, double *dest)
 	}
 	return 8;
 }
-static u8 read_i32(buf b, i32 *dest)
+static i32 read_i32(buf b, i32 *dest)
 {
 	if (b.size < 4)
 	{
@@ -504,7 +497,7 @@ static u8 read_i32(buf b, i32 *dest)
 	}
 	return 4;
 }
-static u8 read_i16(buf b, i16 *dest)
+static i32 read_i16(buf b, i32 *dest)
 {
 	if (b.size < 2)
 	{
@@ -518,7 +511,7 @@ static u8 read_i16(buf b, i16 *dest)
 	}
 	return 2;
 }
-static u8 read_position(buf b, struct position_t *dest)
+static i32 read_position(buf b, struct position_t *dest)
 {
 	u64 l;
 	if (b.size < 8)
@@ -536,7 +529,7 @@ static u8 read_position(buf b, struct position_t *dest)
 
 	return 8;
 }
-static u8 read_u64(buf b, u64 *dest)
+static i32 read_u64(buf b, u64 *dest)
 {
 	i64 l;
 	if (b.size < 8)
@@ -551,9 +544,9 @@ static u8 read_u64(buf b, u64 *dest)
 	}
 	return 8;
 }
-static u8 read_i8(buf b, i8 *dest)
+static i32 read_i8(buf b, i32 *dest)
 {
-	i8 l;
+	i32 l;
 	if (b.size < 1)
 	{
 		return 0;
@@ -566,9 +559,9 @@ static u8 read_i8(buf b, i8 *dest)
 	}
 	return 1;
 }
-static u8 read_float(buf b, float *dest)
+static i32 read_float(buf b, float *dest)
 {
-	u32 f;
+	i32 f;
 	if (b.size < 4)
 	{
 		return 0;
@@ -579,12 +572,12 @@ static u8 read_float(buf b, float *dest)
 
 	return 4;
 }
-static u8 read_str(buf b, str *dest)
+static i32 read_str(buf b, str *dest)
 {
 	i32 strlength;
 	i32 i;
 	char *str;
-	u8 varint_length;
+	i32 varint_length;
 	varint_length = read_varint(b, &strlength);
 	if (strlength > 32767)
 	{
@@ -604,12 +597,12 @@ static u8 read_str(buf b, str *dest)
 	free(str);
 	return i + varint_length;
 }
-static u8 read_varlong(buf b, i64 *dest)
+static i32 read_varlong(buf b, i64 *dest)
 {
 	i64 decoded_long = 0;
 	i32 bit_offset = 0;
-	i8 current_byte = 0;
-	u8 len = 0;
+	i32 current_byte = 0;
+	i32 len = 0;
 
 	do
 	{
@@ -642,7 +635,7 @@ struct packet_t* construct_clientbound_packet(const char* packet_type, ...)
 
 	va_start(argp, packet_type);
 
-	size_t i;
+	i32 i;
 
 	packet->direction = CLIENTBOUND;
 
@@ -660,10 +653,7 @@ struct packet_t* construct_clientbound_packet(const char* packet_type, ...)
 	packet->type = str_construct_from_cstr(packet_type);
 	packet->map = map_construct();
 
-	i32 int32;
-	u16 uint16;
-	i64 int64;
-	u8 uint8;
+	i64 num;
 	struct uuid_t uuid;
 	bool b;
 	str ch;
@@ -676,23 +666,23 @@ struct packet_t* construct_clientbound_packet(const char* packet_type, ...)
 		{
 		case FT_VARINT:
 		case FT_INT:
-			int32 = va_arg(argp, i32);
+			num = va_arg(argp, i32);
 			break;
 		case FT_UNSIGNED_SHORT:
-			uint16 = va_arg(argp, u16);
+			num = va_arg(argp, u16);
 			break;
 		case FT_UNSIGNED_BYTE:
-			uint8 = va_arg(argp, u8);
+			num = va_arg(argp, u8);
 			break;
 		case FT_ANGLE:
-			uint8 = va_arg(argp, u8);
+			num = va_arg(argp, u8);
 			break;
 		case FT_BOOLEAN:
 			b = va_arg(argp, bool);
 			break;
 		case FT_LONG:
 		case FT_VARLONG:
-			int64 = va_arg(argp, i64);
+			num = va_arg(argp, i64);
 			break;
 		case FT_UUID:
 			uuid = va_arg(argp, struct uuid_t);
@@ -729,7 +719,7 @@ void packet_free(struct packet_t* packet)
 buf make_varint(i32 varint)
 {
 	buf buf = buf_construct();
-	size_t i = 0;
+	i32 i = 0;
 	while (true)
 	{
 		if (i == 5)
@@ -770,35 +760,35 @@ buf make_u8(u8 unsigned_byte)
 buf make_i64(i64 l)
 {
 	buf buf = buf_construct();
-	buf_append(&buf, (l & 0xFF00000000000000) >> 56);
-	buf_append(&buf, (l & 0xFF000000000000) >> 48);
-	buf_append(&buf, (l & 0xFF0000000000) >> 40);
-	buf_append(&buf, (l & 0xFF00000000) >> 32);
-	buf_append(&buf, (l & 0xFF000000) >> 24);
-	buf_append(&buf, (l & 0xFF0000) >> 16);
-	buf_append(&buf, (l & 0xFF00) >> 8);
-	buf_append(&buf, (l & 0xFF));
+	buf_append(&buf, (u8) ((l & 0xFF00000000000000) >> 56));
+	buf_append(&buf, (u8) ((l & 0xFF000000000000) >> 48));
+	buf_append(&buf, (u8) ((l & 0xFF0000000000) >> 40));
+	buf_append(&buf, (u8) ((l & 0xFF00000000) >> 32));
+	buf_append(&buf, (u8) ((l & 0xFF000000) >> 24));
+	buf_append(&buf, (u8) ((l & 0xFF0000) >> 16));
+	buf_append(&buf, (u8) ((l & 0xFF00) >> 8));
+	buf_append(&buf, (u8) ((l & 0xFF)));
 	return buf;
 }
 buf make_uuid(struct uuid_t uuid)
 {
 	buf buf = buf_construct();
-	buf_append(&buf, (uuid.high & 0xFF00000000000000) >> 56);
-	buf_append(&buf, (uuid.high & 0xFF000000000000) >> 48);
-	buf_append(&buf, (uuid.high & 0xFF0000000000) >> 40);
-	buf_append(&buf, (uuid.high & 0xFF00000000) >> 32);
-	buf_append(&buf, (uuid.high & 0xFF000000) >> 24);
-	buf_append(&buf, (uuid.high & 0xFF0000) >> 16);
-	buf_append(&buf, (uuid.high & 0xFF00) >> 8);
-	buf_append(&buf, (uuid.high & 0xFF));
-	buf_append(&buf, (uuid.low & 0xFF00000000000000) >> 56);
-	buf_append(&buf, (uuid.low & 0xFF000000000000) >> 48);
-	buf_append(&buf, (uuid.low & 0xFF0000000000) >> 40);
-	buf_append(&buf, (uuid.low & 0xFF00000000) >> 32);
-	buf_append(&buf, (uuid.low & 0xFF000000) >> 24);
-	buf_append(&buf, (uuid.low & 0xFF0000) >> 16);
-	buf_append(&buf, (uuid.low & 0xFF00) >> 8);
-	buf_append(&buf, (uuid.low & 0xFF));
+	buf_append(&buf, (u8) ((uuid.high & 0xFF00000000000000) >> 56));
+	buf_append(&buf, (u8) ((uuid.high & 0xFF000000000000) >> 48));
+	buf_append(&buf, (u8) ((uuid.high & 0xFF0000000000) >> 40));
+	buf_append(&buf, (u8) ((uuid.high & 0xFF00000000) >> 32));
+	buf_append(&buf, (u8) ((uuid.high & 0xFF000000) >> 24));
+	buf_append(&buf, (u8) ((uuid.high & 0xFF0000) >> 16));
+	buf_append(&buf, (u8) ((uuid.high & 0xFF00) >> 8));
+	buf_append(&buf, (u8) ((uuid.high & 0xFF)));
+	buf_append(&buf, (u8) ((uuid.low & 0xFF00000000000000) >> 56));
+	buf_append(&buf, (u8) ((uuid.low & 0xFF000000000000) >> 48));
+	buf_append(&buf, (u8) ((uuid.low & 0xFF0000000000) >> 40));
+	buf_append(&buf, (u8) ((uuid.low & 0xFF00000000) >> 32));
+	buf_append(&buf, (u8) ((uuid.low & 0xFF000000) >> 24));
+	buf_append(&buf, (u8) ((uuid.low & 0xFF0000) >> 16));
+	buf_append(&buf, (u8) ((uuid.low & 0xFF00) >> 8));
+	buf_append(&buf, (u8) ((uuid.low & 0xFF)));
 
 	
 	
@@ -821,14 +811,14 @@ buf make_double(double d)
 {
 	buf buf = buf_construct();
 	
-	buf_append(&buf, ((*(u64 *)&d) & 0xFF00000000000000) >> 56);
-	buf_append(&buf, ((*(u64 *)&d) & 0xFF000000000000) >> 48);
-	buf_append(&buf, ((*(u64 *)&d) & 0xFF0000000000) >> 40);
-	buf_append(&buf, ((*(u64 *)&d) & 0xFF00000000) >> 32);
-	buf_append(&buf, ((*(u64 *)&d) & 0xFF000000) >> 24);
-	buf_append(&buf, ((*(u64 *)&d) & 0xFF0000) >> 16);
-	buf_append(&buf, ((*(u64 *)&d) & 0xFF00) >> 8);
-	buf_append(&buf, ((*(u64 *)&d) & 0xFF));
+	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF00000000000000) >> 56));
+	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF000000000000) >> 48));
+	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF0000000000) >> 40));
+	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF00000000) >> 32));
+	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF000000) >> 24));
+	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF0000) >> 16));
+	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF00) >> 8));
+	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF)));
 	
 	
 	return buf;
@@ -894,13 +884,13 @@ buf make_i8(i8 byte)
 }
 buf make_float(float f)
 {
-	u32 data;
-	data = *((u32*)&f);
+	i32 data;
+	data = *((i32*)&f);
 	return make_i32(data);
 }
 buf make_string(str str)
 {
-	size_t i;
+	i32 i;
 	buf b = buf_construct();
 	char* cstr = str_cstr(str);
 	buf varint_buf = make_varint(str.size);
@@ -944,8 +934,8 @@ buf make_varlong(i64 varlong)
 void slurp_file_to_cstr(const char* file_name, char** cstr)
 {
 	FILE* fp = fopen(file_name, "r");
-	long f_size;
-	size_t new_len;
+	i64 f_size;
+	i32 new_len;
 
 	if (!fp)
 	{
@@ -963,11 +953,11 @@ void slurp_file_to_cstr(const char* file_name, char** cstr)
 		return;
 	}
 
-	*cstr = calloc(f_size + 1, sizeof(char));
+	*cstr = mcsalloc(sizeof(char) * ((i32) f_size + 1));
 
 	fseek(fp, 0, SEEK_SET);
 
-	new_len = fread(*cstr, sizeof(char), f_size, fp);
+	new_len = fread(*cstr, sizeof(char), (size_t) f_size, fp);
 
 	if (!new_len)
 	{

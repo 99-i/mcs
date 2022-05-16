@@ -129,7 +129,8 @@ void run_network_loop(void *data)
 
 void on_write_end(uv_write_t* req, int status)
 {
-	if (status == -1) {
+	if (status == -1)
+	{
 		fprintf(stderr, "error on_write_end");
 		return;
 	}
@@ -138,7 +139,8 @@ void on_write_end(uv_write_t* req, int status)
 
 void server_send_packet(struct client_t* client, struct packet_t* packet)
 {
-
+	//TODO
+	assert(false && "TODO");
 }
 
 

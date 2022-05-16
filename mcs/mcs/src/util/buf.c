@@ -9,7 +9,7 @@ buf buf_construct()
 	b.is_slice = false;
 	return b;
 }
-buf buf_construct_data(u8* bytes, size_t size)
+buf buf_construct_data(u8* bytes, i32 size)
 {
 	buf b;
 	b.size = size;
@@ -43,7 +43,7 @@ void buf_append_buf(buf* b1, const buf b2)
 	b1->data = mcsrealloc(b1->data, sizeof(u8) * b1->size);
 	memcpy(b1->data + original_size, b2.data, b2.size);
 }
-buf buf_slice_from_buf(buf b1, size_t low, size_t high)
+buf buf_slice_from_buf(buf b1, i32 low, i32 high)
 {
 	buf temp;
 	temp = buf_construct_data(b1.data + low, high - low);

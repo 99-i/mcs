@@ -18,9 +18,6 @@
     <ClCompile Include="mcs\src\main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mcs\src\loop.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="mcs\src\server.c">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -2,9 +2,11 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "util/def.h"
+
 typedef struct str
 {
-	size_t size;
+	i32 size;
 	char* data;
 	const char* tempdata;
 	bool is_temp;

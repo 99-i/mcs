@@ -49,14 +49,14 @@ bool streq_cstr(str s1, const char* s2)
 }
 void str_append_cstr(str *s1, const char* s2)
 {
-	size_t original_size = s1->size;
+	i32 original_size = s1->size;
 	s1->size += strlen(s2);
 	s1->data = mcsrealloc(s1->data, sizeof(char) * s1->size);
 	memcpy(s1->data + original_size, s2, strlen(s2));
 }
 void str_append_str(str* s1, str s2)
 {
-	size_t original_size = s1->size;
+	i32 original_size = s1->size;
 	if (s2.size == 0) return;
 	if (s1->size == 0) return;
 

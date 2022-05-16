@@ -92,7 +92,7 @@ struct client_t *game_init_client(uv_tcp_t *socket)
 
 struct client_t *game_get_client(uv_tcp_t *socket)
 {
-	u32 i;
+	i32 i;
 
 	uv_mutex_lock(&lock);
 	for (i = 0; i < game->server->clients.size; i++)
@@ -304,7 +304,7 @@ void game_handle_client_packet(struct client_t *client, struct packet_t *packet)
 void game_handle_client_disconnect(uv_tcp_t *client)
 {
 	struct client_t *removed_client = 0;
-	size_t i;
+	i32 i;
 
 	uv_mutex_lock(&lock);
 	for (i = 0; i < game->server->clients.size; i++)

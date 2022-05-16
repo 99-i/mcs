@@ -54,12 +54,12 @@ struct game_t
 {
 	struct server_t *server;
 	world_array worlds;
-	u32 tick_count;
+	i32 tick_count;
 };
 struct packet_metadata_t
 {
-	u8 packet_id;
-	u16 length;
+	i32 packet_id;
+	i32 length;
 };
 
 
@@ -81,7 +81,7 @@ struct packet_t
 };
 struct wraparound_t
 {
-	u32 cutoff;
-	u32 first_size;
-	u32 second_size;
+	i32 cutoff;
+	i32 first_size;
+	i32 second_size;
 };
