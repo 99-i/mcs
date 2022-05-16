@@ -86,12 +86,13 @@ static void handle_read(uv_stream_t *stream, buf data, bool is_wraparound)
 
 	struct packet_t packet;
 
-	res = create_serverbound_packet(data, client->state, &packet);
+	/*res = create_serverbound_packet(data, client->state, &packet);
 
 	if (res)
 	{
 		game_handle_client_packet(client, &packet);
 	}
+	*/
 	if (!is_wraparound)
 	{
 		buf_destroy(&data);
@@ -117,7 +118,6 @@ static void read_stream(uv_stream_t *stream, ssize_t nread, const uv_buf_t *read
 	{
 		free(readbuf->base);
 	}
-	free(readbuf);
 }
 
 

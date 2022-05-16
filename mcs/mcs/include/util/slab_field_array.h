@@ -2,7 +2,7 @@
 
 #include "def.h"
 #include "string.h"
-
+#include "slab_field.h"
 
 #define ARRAY_TYPE struct field_t
 #define ARRAY_NAME slab_field

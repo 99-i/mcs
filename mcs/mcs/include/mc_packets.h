@@ -16,8 +16,8 @@ void slurp_file_to_cstr(const char* file_name, char** cstr);
 void construct_slabs(void);
 
 bool should_wraparound(buf b, struct wraparound_t *cutoff);
-bool create_serverbound_packet(buf b, enum estate state, struct packet_t *packet);
 
+bool create_serverbound_packet(buf b, enum estate state, struct packet_t *packet);
 struct packet_t* construct_clientbound_packet(str packet_type, ...);
 
 

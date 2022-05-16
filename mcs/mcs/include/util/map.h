@@ -3,6 +3,8 @@
 #include "util/string.h"
 #include "util/def.h"
 #undef uuid_t
+#include "uuid.h"
+#include "position.h"
 enum emap_type
 {
 	MAPTYPE_I8,

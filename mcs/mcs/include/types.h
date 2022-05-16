@@ -1,22 +1,14 @@
 #pragma once
+#include "world.h"
+#include "slab.h"
 #include "util/def.h"
 #include "util/string.h"
 #include "util/client_array.h"
+
 #include "util/world_array.h"
 #include "util/slab_field_array.h"
 #include <uv.h>
 #undef uuid_t
-struct position_t
-{
-	i32 x;
-	i16 y;
-	i32 z;
-};
-struct uuid_t
-{
-	u64 high;
-	u64 low;
-};
 
 typedef struct vector3f_t
 {
@@ -25,11 +17,6 @@ typedef struct vector3f_t
 	float z;
 } vector3f;
 
-struct world_t
-{
-	int i;
-	//TODO
-};
 struct entity_player_t;
 struct game_t;
 
@@ -91,43 +78,6 @@ struct packet_t
 	enum epacket_direction direction;
 	str type;
 	map map;
-};
-
-enum efield_type
-{
-	FT_VARINT,
-	FT_UNSIGNED_SHORT,
-	FT_UNSIGNED_BYTE,
-	FT_LONG,
-	FT_UUID,
-	FT_BOOLEAN,
-	FT_DOUBLE,
-	FT_ANGLE,
-	FT_INT,
-	FT_SHORT,
-	FT_POSITION,
-	FT_BYTE,
-	FT_FLOAT,
-	FT_STRING,
-	FT_VARLONG,
-};
-struct field_t
-{
-	str field_name;
-	enum efield_type type;
-};
-struct slab_t
-{
-	str name;
-	uint32_t id;
-	enum estate state;
-	enum epacket_direction direction;
-	slab_field_array fields;
-};
-
-struct slabinfo_t
-{
-	slab_array slabs;
 };
 struct wraparound_t
 {

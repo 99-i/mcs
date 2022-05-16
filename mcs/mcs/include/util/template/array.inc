@@ -24,6 +24,7 @@ ARRAY_STRUCT_NAME CAT(ARRAY_STRUCT_NAME, _construct)(size_t size)
 	array.capacity = size;
 	array.size = 0;
 	array.fields = malloc(sizeof(ARRAY_TYPE) * size);
+	return array;
 }
 void CAT(ARRAY_STRUCT_NAME, _append)(ARRAY_STRUCT_NAME* array, ARRAY_TYPE field)
 {
@@ -52,6 +53,7 @@ void CAT(ARRAY_STRUCT_NAME, _destroy)(ARRAY_STRUCT_NAME* array)
 
 void CAT(ARRAY_STRUCT_NAME, _remove)(ARRAY_STRUCT_NAME* array, size_t index)
 {
+
 	memmove(array->fields + index, array->fields + index + 1, (array->size - 1 - index) * sizeof(ARRAY_TYPE));
 	array->size--;
 }

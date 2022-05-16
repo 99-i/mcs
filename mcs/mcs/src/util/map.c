@@ -1,6 +1,7 @@
 #include "util/map.h"
 #include <stdlib.h>
 #include "types.h"
+
 map_value mv_i8(i8 i8)
 {
 	return (map_value) {
@@ -162,6 +163,7 @@ map_value map_get(map m, str s)
 			return real->fields[i].value;
 		}
 	}
+	return mv_u8(-1);
 }
 
 void map_destroy(map m)

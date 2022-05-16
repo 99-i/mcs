@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "types.h"
+#include "util/map.h"
 uv_loop_t game_loop;
 
 static uv_timer_t timer;
@@ -108,7 +109,7 @@ struct client_t *game_get_client(uv_tcp_t *socket)
 void game_handle_client_packet(struct client_t *client, struct packet_t *packet)
 {
 	assert(packet->direction == SERVERBOUND);
-	printf("received %s!\n", packet->type);
+	printf("received %.*s!\n", packet->type.size, packet->type.data);
 
 	if (streq_cstr(packet->type, "Handshake"))
 	{
@@ -331,11 +332,11 @@ void game_handle_client_disconnect(uv_tcp_t *client)
 
 static void sb_handle_handshake(struct client_t *client, struct packet_t *packet)
 {
-	int32_t next_state;
+	i32 next_state;
 
-	assert((packet->direction == SERVERBOUND) && !strcmp_cstr(packet->type, "Handshake"));
+	assert((packet->direction == SERVERBOUND) && !streq_cstr(packet->type, "Handshake"));
 
-	map_get(packet->map, str_cstr_temp("Next State"), &next_state);
+	next_state = map_get(packet->map, str_cstr_temp("Next State")).i32;
 
 	switch (next_state)
 	{
@@ -353,7 +354,7 @@ static void sb_handle_handshake(struct client_t *client, struct packet_t *packet
 static void sb_handle_request(struct client_t *client, struct packet_t *packet)
 {
 
-	char* i = "{ \
+	const char* i = "{ \
 			\"version\": { \
 				\"name\": \"1.8.7\", \
 				\"protocol\": 47 \
@@ -366,16 +367,15 @@ static void sb_handle_request(struct client_t *client, struct packet_t *packet)
 				\"text\": \"Hello world\" \
 			} \
 		}";
-
+	
 	struct packet_t* response_packet = construct_clientbound_packet(str_cstr_temp("Response"), i);
 	server_send_packet(client, response_packet);
 
 	packet_free(response_packet);
-
 }
 static void sb_handle_ping(struct client_t *client, struct packet_t *packet)
 {
-	map_value ping = map_get(packet->map, str_cstr_temp("Payload"));
+	//map_value ping = map_get(packet->map, str_cstr_temp("Payload"));
 
 
 

@@ -28,6 +28,8 @@
     <ClCompile Include="mcs\src\server.c" />
     <ClCompile Include="mcs\src\util\buf.c" />
     <ClCompile Include="mcs\src\util\client_array.c" />
+    <ClCompile Include="mcs\src\util\map.c" />
+    <ClCompile Include="mcs\src\util\slab_array.c" />
     <ClCompile Include="mcs\src\util\slab_field_array.c" />
     <ClCompile Include="mcs\src\util\string.c" />
     <ClCompile Include="mcs\src\util\world_array.c" />
@@ -37,7 +39,10 @@
     <ClInclude Include="mcs\include\game.h" />
     <ClInclude Include="mcs\include\mcs.h" />
     <ClInclude Include="mcs\include\mc_packets.h" />
+    <ClInclude Include="mcs\include\position.h" />
     <ClInclude Include="mcs\include\server.h" />
+    <ClInclude Include="mcs\include\slab.h" />
+    <ClInclude Include="mcs\include\slab_field.h" />
     <ClInclude Include="mcs\include\types.h" />
     <ClInclude Include="mcs\include\util\buf.h" />
     <ClInclude Include="mcs\include\util\client_array.h" />
@@ -48,8 +53,8 @@
     <ClInclude Include="mcs\include\util\string.h" />
     <ClInclude Include="mcs\include\util\template\array.inc" />
     <ClInclude Include="mcs\include\util\world_array.h" />
-    <ClInclude Include="mcs\src\util\map.c" />
-    <ClInclude Include="mcs\src\util\slab_array.c" />
+    <ClInclude Include="mcs\include\uuid.h" />
+    <ClInclude Include="mcs\include\world.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

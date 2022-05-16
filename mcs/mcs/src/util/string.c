@@ -41,6 +41,7 @@ str str_clone_str(str s1)
 	str s;
 	s.size = s1.size;
 	s.is_temp = false;
+	s.data = malloc(sizeof(char) * s1.size);
 	memcpy(s.data, s1.data, s.size);
 	
 	return s;
