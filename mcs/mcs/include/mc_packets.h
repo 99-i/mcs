@@ -18,7 +18,7 @@ void construct_slabs(void);
 bool should_wraparound(buf b, struct wraparound_t *cutoff);
 
 bool create_serverbound_packet(buf b, enum estate state, struct packet_t *packet);
-struct packet_t* construct_clientbound_packet(str packet_type, ...);
+struct packet_t* construct_clientbound_packet(const char* packet_type, ...);
 
 
 void packet_free(struct packet_t* packet);

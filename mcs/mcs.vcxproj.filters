@@ -57,6 +57,9 @@
     <ClCompile Include="mcs\src\util\map.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="mcs\src\util\def.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mcs\include\mcs.h">

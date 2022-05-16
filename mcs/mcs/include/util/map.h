@@ -62,7 +62,8 @@ map map_construct();
 
 void map_set(map m, str s, map_value mv);
 
-map_value map_get(map m, str s);
+map_value map_get_str(map m, str s);
+map_value map_get_cstr(map m, const char* s);
 
 void map_destroy(map m);
 

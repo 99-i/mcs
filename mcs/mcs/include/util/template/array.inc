@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include "util/def.h"
 #define _CAT(x, y) x ## y
 #define CAT(x, y) _CAT(x, y)
 #define ARRAY_STRUCT_NAME CAT(ARRAY_NAME, _array)
@@ -24,7 +25,7 @@ ARRAY_STRUCT_NAME CAT(ARRAY_STRUCT_NAME, _construct)(size_t size)
 	ARRAY_STRUCT_NAME array;
 	array.capacity = size;
 	array.size = 0;
-	array.fields = malloc(sizeof(ARRAY_TYPE) * size);
+	array.fields = mcsalloc(sizeof(ARRAY_TYPE) * size);
 	return array;
 }
 void CAT(ARRAY_STRUCT_NAME, _append)(ARRAY_STRUCT_NAME* array, ARRAY_TYPE field)
@@ -34,7 +35,7 @@ void CAT(ARRAY_STRUCT_NAME, _append)(ARRAY_STRUCT_NAME* array, ARRAY_TYPE field)
 		array->capacity += 1;
 		if (array->capacity == 1)
 		{
-			array->fields = malloc(sizeof(ARRAY_TYPE) * 1);
+			array->fields = mcsalloc(sizeof(ARRAY_TYPE) * 1);
 		}
 		else
 		{

@@ -11,3 +11,14 @@ void *mcsalloc(u64 s)
 	}
 	return m;
 }
+
+void *mcsrealloc(void *block, u64 s)
+{
+	void* m = realloc(block, s);
+	if(m == 0)
+	{
+		assert(false && "we have a problem.");
+		exit(1);
+	}
+	return m;
+}

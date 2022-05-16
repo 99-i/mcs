@@ -590,7 +590,7 @@ static u8 read_str(buf b, str *dest)
 	{
 		return 0;
 	}
-	str = calloc(strlength + 1, sizeof(char));
+	str = mcsalloc(sizeof(char) * (strlength + 1));
 	for (i = 0; i < strlength; i++)
 	{
 		if (i + varint_length > b.size)
@@ -632,9 +632,9 @@ static u8 read_varlong(buf b, i64 *dest)
 	}
 	return len;
 }
-struct packet_t* construct_clientbound_packet(str packet_type, ...)
+struct packet_t* construct_clientbound_packet(const char* packet_type, ...)
 {
-	struct packet_t* packet = malloc(sizeof(struct packet_t));
+	struct packet_t* packet = mcsalloc(sizeof(struct packet_t));
 	struct slab_t* current_slab = 0;
 	struct field_t* current_field = 0;
 
@@ -648,7 +648,7 @@ struct packet_t* construct_clientbound_packet(str packet_type, ...)
 
 	for (i = 0; i < slabinfo.slabs.size; i++)
 	{
-		if (!streq_str(packet_type, slabinfo.slabs.fields[i].name))
+		if (!streq_cstr(slabinfo.slabs.fields[i].name, packet_type))
 		{
 			current_slab = &slabinfo.slabs.fields[i];
 		}
@@ -657,7 +657,7 @@ struct packet_t* construct_clientbound_packet(str packet_type, ...)
 	assert(current_slab != 0);
 	assert(current_slab->direction == CLIENTBOUND);
 
-	packet->type = str_clone_str(packet_type);
+	packet->type = str_construct_from_cstr(packet_type);
 	packet->map = map_construct();
 
 	i32 int32;

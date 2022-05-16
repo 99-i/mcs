@@ -81,7 +81,7 @@ struct client_t *game_init_client(uv_tcp_t *socket)
 {
 	struct client_t *client;
 	uv_mutex_lock(&lock);
-	client = malloc(sizeof(struct client_t));
+	client = mcsalloc(sizeof(struct client_t));
 	client->socket = socket;
 	client->state = STATE_HANDSHAKING;
 	client->player = 0;
@@ -336,7 +336,7 @@ static void sb_handle_handshake(struct client_t *client, struct packet_t *packet
 
 	assert((packet->direction == SERVERBOUND) && !streq_cstr(packet->type, "Handshake"));
 
-	next_state = map_get(packet->map, str_cstr_temp("Next State")).i32;
+	next_state = map_get_cstr(packet->map, "Next State").i32;
 
 	switch (next_state)
 	{
@@ -368,7 +368,7 @@ static void sb_handle_request(struct client_t *client, struct packet_t *packet)
 			} \
 		}";
 	
-	struct packet_t* response_packet = construct_clientbound_packet(str_cstr_temp("Response"), i);
+	struct packet_t* response_packet = construct_clientbound_packet("Response", i);
 	server_send_packet(client, response_packet);
 
 	packet_free(response_packet);

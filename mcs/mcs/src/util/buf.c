@@ -13,7 +13,7 @@ buf buf_construct_data(u8* bytes, size_t size)
 {
 	buf b;
 	b.size = size;
-	b.data = malloc(sizeof(u8) * size);
+	b.data = mcsalloc(sizeof(u8) * size);
 	memcpy(b.data, bytes, size);
 	b.is_slice = false;
 	return b;
@@ -26,7 +26,7 @@ void buf_append(buf* b, u8 byte)
 		return;
 	}
 	b->size += 1;
-	b->data = realloc(b->data, sizeof(u8) * b->size);
+	b->data = mcsrealloc(b->data, sizeof(u8) * b->size);
 	b->data[b->size - 1] = byte;
 }
 void buf_append_buf(buf* b1, const buf b2)
@@ -40,7 +40,7 @@ void buf_append_buf(buf* b1, const buf b2)
 	if (b2.size == 0) return;
 
 	b1->size += b2.size;
-	b1->data = realloc(b1->data, sizeof(u8) * b1->size);
+	b1->data = mcsrealloc(b1->data, sizeof(u8) * b1->size);
 	memcpy(b1->data + original_size, b2.data, b2.size);
 }
 buf buf_slice_from_buf(buf b1, size_t low, size_t high)

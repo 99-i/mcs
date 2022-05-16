@@ -38,7 +38,7 @@ void init_network_loop(void)
 static void on_new_connection(uv_stream_t *server, int status)
 {
 	int result;
-	uv_tcp_t *client = malloc(sizeof(uv_tcp_t));
+	uv_tcp_t *client = mcsalloc(sizeof(uv_tcp_t));
 	uv_tcp_init(&network_loop, client);
 	result = uv_accept(server, (uv_stream_t *)client);
 	CHECKRESULT;
@@ -50,7 +50,7 @@ static void on_new_connection(uv_stream_t *server, int status)
 
 static void allocate_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf)
 {
-	buf->base = malloc(suggested_size);
+	buf->base = mcsalloc(suggested_size);
 	buf->len = suggested_size;
 }
 

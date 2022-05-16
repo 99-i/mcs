@@ -28,6 +28,7 @@
     <ClCompile Include="mcs\src\server.c" />
     <ClCompile Include="mcs\src\util\buf.c" />
     <ClCompile Include="mcs\src\util\client_array.c" />
+    <ClCompile Include="mcs\src\util\def.c" />
     <ClCompile Include="mcs\src\util\map.c" />
     <ClCompile Include="mcs\src\util\slab_array.c" />
     <ClCompile Include="mcs\src\util\slab_field_array.c" />
