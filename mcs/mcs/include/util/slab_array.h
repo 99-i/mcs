@@ -2,10 +2,11 @@
 #include "def.h"
 #include "string.h"
 #include "slab_field_array.h"
+
 struct slab_t
 {
 	str name;
-	uint32_t id;
+	u32 id;
 	enum estate state;
 	enum epacket_direction direction;
 	slab_field_array fields;

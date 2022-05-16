@@ -17,19 +17,19 @@ sliced = buf_slice_from_buf(b, data_needle, b.size)
 
 struct slabinfo_t slabinfo;
 static u8 read_varint(buf b, i32 *dest);
-static u8 read_unsigned_short(buf b, u16 *dest);
-static u8 read_unsigned_byte(buf b, u8 *dest);
-static u8 read_long(buf b, i64 *dest);
-static u8 read_unsigned_long(buf b, u64 *dest);
+static u8 read_u16(buf b, u16 *dest);
+static u8 read_u8(buf b, u8 *dest);
+static u8 read_i64(buf b, i64 *dest);
+static u8 read_u64(buf b, u64 *dest);
 static u8 read_uuid(buf b, struct uuid_t *dest);
-static u8 read_boolean(buf b, bool *dest);
+static u8 read_bool(buf b, bool *dest);
 static u8 read_double(buf b, double *dest);
-static u8 read_int(buf b, i32 *dest);
-static u8 read_short(buf b, i16 *dest);
+static u8 read_i32(buf b, i32 *dest);
+static u8 read_i16(buf b, i16 *dest);
 static u8 read_position(buf b, struct position_t *dest);
-static u8 read_byte(buf b, i8 *dest);
+static u8 read_i8(buf b, i8 *dest);
 static u8 read_float(buf b, float *dest);
-static u8 read_string(buf b, str *dest);
+static u8 read_str(buf b, str *dest);
 static u8 read_varlong(buf b, i64 *dest);
 
 struct packet_metadata_t get_packet_metadata(buf b)
@@ -408,7 +408,7 @@ static u8 read_varint(buf b, i32 *dest)
 	}
 	return len;
 }
-static u8 read_unsigned_short(buf b, u16 *dest)
+static u8 read_u16(buf b, u16 *dest)
 {
 	if (b.size < 2)
 	{
@@ -418,7 +418,7 @@ static u8 read_unsigned_short(buf b, u16 *dest)
 	*dest = (b.data[0] << 8) | b.data[1];
 	return 2;
 }
-static u8 read_unsigned_byte(buf b, u8 *dest)
+static u8 read_u8(buf b, u8 *dest)
 {
 	if (b.size < 1)
 	{
@@ -427,7 +427,7 @@ static u8 read_unsigned_byte(buf b, u8 *dest)
 	*dest = b.data[0];
 	return 1;
 }
-static u8 read_long(buf b, i64 *dest)
+static u8 read_i64(buf b, i64 *dest)
 {
 	if (b.size < 8)
 	{
@@ -461,7 +461,7 @@ static u8 read_uuid(buf b, struct uuid_t *dest)
 	dest->low = low;
 	return 16;
 }
-static u8 read_boolean(buf b, bool *dest)
+static u8 read_bool(buf b, bool *dest)
 {
 	if (b.size < 1)
 	{
@@ -488,7 +488,7 @@ static u8 read_double(buf b, double *dest)
 	}
 	return 8;
 }
-static u8 read_int(buf b, i32 *dest)
+static u8 read_i32(buf b, i32 *dest)
 {
 	if (b.size < 4)
 	{
@@ -501,7 +501,7 @@ static u8 read_int(buf b, i32 *dest)
 	}
 	return 4;
 }
-static u8 read_short(buf b, i16 *dest)
+static u8 read_i16(buf b, i16 *dest)
 {
 	if (b.size < 2)
 	{
@@ -533,7 +533,7 @@ static u8 read_position(buf b, struct position_t *dest)
 
 	return 8;
 }
-static u8 read_unsigned_long(buf b, u64 *dest)
+static u8 read_u64(buf b, u64 *dest)
 {
 	i64 l;
 	if (b.size < 8)
@@ -548,7 +548,7 @@ static u8 read_unsigned_long(buf b, u64 *dest)
 	}
 	return 8;
 }
-static u8 read_byte(buf b, i8 *dest)
+static u8 read_i8(buf b, i8 *dest)
 {
 	i8 l;
 	if (b.size < 1)
@@ -576,7 +576,7 @@ static u8 read_float(buf b, float *dest)
 
 	return 4;
 }
-static u8 read_string(buf b, str *dest)
+static u8 read_str(buf b, str *dest)
 {
 	i32 strlength;
 	size_t i;

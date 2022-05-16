@@ -57,10 +57,10 @@ static void allocate_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t
 static void handle_read(uv_stream_t *stream, buf data, bool is_wraparound)
 {
 	bool res;
-	int32_t protocol_version;
+	i32 protocol_version;
 	char *address;
-	uint16_t port;
-	int32_t next_state;
+	u16 port;
+	i32 next_state;
 	struct client_t *client;
 	struct wraparound_t wraparound;
 	buf sliced;

@@ -92,7 +92,7 @@ struct client_t *game_init_client(uv_tcp_t *socket)
 
 struct client_t *game_get_client(uv_tcp_t *socket)
 {
-	uint32_t i;
+	u32 i;
 
 	uv_mutex_lock(&lock);
 	for (i = 0; i < game->server->clients.size; i++)
