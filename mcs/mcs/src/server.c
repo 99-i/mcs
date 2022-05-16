@@ -56,15 +56,13 @@ static void allocate_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t
 
 static void handle_read(uv_stream_t *stream, buf data, bool is_wraparound)
 {
-	bool res;
-	i32 protocol_version;
-	char *address;
-	u16 port;
-	i32 next_state;
+	//bool res;
 	struct client_t *client;
 	struct wraparound_t wraparound;
 	buf sliced;
-	struct packet_metadata_t metadata = get_packet_metadata(data);
+	struct packet_metadata_t metadata;
+	
+	metadata = get_packet_metadata(data);
 
 	if (should_wraparound(data, &wraparound))
 	{
@@ -78,13 +76,13 @@ static void handle_read(uv_stream_t *stream, buf data, bool is_wraparound)
 		return;
 	}
 
-	if (0 == (client = game_get_client(stream)))
+	if (0 == (client = game_get_client((uv_tcp_t*) stream)))
 	{
-		client = game_init_client(stream);
+		client = game_init_client((uv_tcp_t*) stream);
 	}
 
 
-	struct packet_t packet;
+	//struct packet_t packet;
 
 	/*res = create_serverbound_packet(data, client->state, &packet);
 
@@ -106,7 +104,7 @@ static void read_stream(uv_stream_t *stream, ssize_t nread, const uv_buf_t *read
 	{
 		if (nread == UV_EOF)
 		{
-			game_handle_client_disconnect(stream);
+			game_handle_client_disconnect((uv_tcp_t*) stream);
 			return;
 		}
 	}

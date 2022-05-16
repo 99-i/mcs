@@ -318,7 +318,7 @@ void game_handle_client_disconnect(uv_tcp_t *client)
 	assert(removed_client != 0);
 	assert(client != 0);
 
-	uv_close(client, NULL);
+	uv_close((uv_handle_t*) client, NULL);
 	free(client);
 
 	client_array_remove(&game->server->clients, i);

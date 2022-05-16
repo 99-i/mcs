@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #define _CAT(x, y) x ## y
 #define CAT(x, y) _CAT(x, y)
 #define ARRAY_STRUCT_NAME CAT(ARRAY_NAME, _array)

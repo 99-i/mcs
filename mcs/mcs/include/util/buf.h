@@ -4,7 +4,7 @@
 #include <stdbool.h>
 typedef struct buf
 {
-	size_t size;
+	i32 size;
 	u8* data;
 	bool is_slice;
 } buf;
