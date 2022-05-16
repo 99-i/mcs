@@ -46,7 +46,8 @@ void buf_append_buf(buf* b1, const buf b2)
 buf buf_slice_from_buf(buf b1, i32 low, i32 high)
 {
 	buf temp;
-	temp = buf_construct_data(b1.data + low, high - low);
+	temp.data = b1.data + low;
+	temp.size = high - low;
 	temp.is_slice = true;
 	return temp;
 }
@@ -54,7 +55,7 @@ void buf_destroy(buf* b)
 {
 	if (b->is_slice) return;
 
-	free(b->data);
+	mcsfree(b->data);
 	b->size = 0;
 	b->data = 0;
 }

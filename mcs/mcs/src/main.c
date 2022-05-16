@@ -34,4 +34,13 @@ int main()
 	return 0;
 }
 
-
+int main2()
+{
+	construct_slabs();
+	for(int i = 0; i < 10000000; i++)
+	{
+		game_init_client(0);
+		game_handle_client_disconnect(0);
+	}
+	return 0;
+}

@@ -68,7 +68,7 @@ void str_append_str(str* s1, str s2)
 void str_destroy(str* s)
 {
 	if (s->is_temp) return;
-	free(s->data);
+	mcsfree(s->data);
 	s->data = 0;
 	s->data = 0;
 }
