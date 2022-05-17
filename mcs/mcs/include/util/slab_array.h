@@ -5,7 +5,7 @@
 
 struct slab_t
 {
-	const char* name;
+	str name;
 	i32 id;
 	enum estate state;
 	enum epacket_direction direction;

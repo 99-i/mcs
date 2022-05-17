@@ -10,7 +10,7 @@
 #include "util/buf.h"
 #include "uuid.h"
 #include "types.h"
-#include "position.h"
+
 #undef uuid_t
 #define READY_SLICED_BUFFER() buf_destroy(&sliced); \
 sliced = buf_slice_from_buf(b, data_needle, b.size)
@@ -77,7 +77,7 @@ void construct_slabs(void)
 		slab.direction = bound_to_to_direction(cJSON_GetObjectItem(current_slab, "boundTo")->valuestring);
 		slab.state = state_str_to_state(cJSON_GetObjectItem(current_slab, "state")->valuestring);
 		slab.id = cJSON_GetObjectItem(current_slab, "id")->valueint;
-		slab.name = cJSON_GetObjectItem(current_slab, "name")->valuestring;
+		slab.name = str_construct_from_cstr(cJSON_GetObjectItem(current_slab, "name")->valuestring);
 
 		fields = cJSON_GetObjectItem(current_slab, "fields");
 
@@ -285,7 +285,7 @@ bool create_serverbound_packet(buf b, enum estate state, struct packet_t* packet
 		{
 			found_slab = true;
 			struct slab_t *slab = &slabinfo.slabs.fields[i];
-			packet->type = slab->name;
+			packet->type = str_clone_str(slab->name);
 			packet->map = map_construct();
 			packet->direction = SERVERBOUND;
 
@@ -588,13 +588,13 @@ static i32 read_str(buf b, str *dest)
 	{
 		if (i + varint_length > b.size)
 		{
-			mcsfree(str);
+			free(str);
 			return 0;
 		}
 		str[i] = b.data[i + varint_length];
 	}
 	*dest = str_construct_from_cstr(str);
-	mcsfree(str);
+	free(str);
 	return i + varint_length;
 }
 static i32 read_varlong(buf b, i64 *dest)
@@ -641,7 +641,7 @@ struct packet_t* construct_clientbound_packet(const char* packet_type, ...)
 
 	for (i = 0; i < slabinfo.slabs.size; i++)
 	{
-		if (!strcmp(slabinfo.slabs.fields[i].name, packet_type))
+		if (!streq_cstr(slabinfo.slabs.fields[i].name, packet_type))
 		{
 			current_slab = &slabinfo.slabs.fields[i];
 		}
@@ -650,16 +650,13 @@ struct packet_t* construct_clientbound_packet(const char* packet_type, ...)
 	assert(current_slab != 0);
 	assert(current_slab->direction == CLIENTBOUND);
 
-	packet->type = packet_type;
+	packet->type = str_construct_from_cstr(packet_type);
 	packet->map = map_construct();
 
 	i64 num;
 	struct uuid_t uuid;
-	struct position_t pos;
 	bool b;
 	str ch;
-	float f;
-	double d;
 
 	for (i = 0; i < current_slab->fields.size; i++)
 	{
@@ -670,56 +667,38 @@ struct packet_t* construct_clientbound_packet(const char* packet_type, ...)
 		case FT_VARINT:
 		case FT_INT:
 			num = va_arg(argp, i32);
-			map_set(packet->map, current_field->field_name, mv_i32(num));
 			break;
 		case FT_UNSIGNED_SHORT:
 			num = va_arg(argp, u16);
-			map_set(packet->map, current_field->field_name, mv_i32(num));
 			break;
 		case FT_UNSIGNED_BYTE:
 			num = va_arg(argp, u8);
-			map_set(packet->map, current_field->field_name, mv_i32(num));
 			break;
 		case FT_ANGLE:
 			num = va_arg(argp, u8);
-			map_set(packet->map, current_field->field_name, mv_i32(num));
 			break;
 		case FT_BOOLEAN:
 			b = va_arg(argp, bool);
-			map_set(packet->map, current_field->field_name, mv_u8(b));
 			break;
 		case FT_LONG:
 		case FT_VARLONG:
 			num = va_arg(argp, i64);
-			map_set(packet->map, current_field->field_name, mv_i64(num));
 			break;
 		case FT_UUID:
 			uuid = va_arg(argp, struct uuid_t);
-			map_set(packet->map, current_field->field_name, mv_uuid(uuid));
 			break;
 		case FT_DOUBLE:
-			d = va_arg(argp, double);
-			map_set(packet->map, current_field->field_name, mv_double(d));
 			break;
 		case FT_SHORT:
-			num = va_arg(argp, i16);
-			map_set(packet->map, current_field->field_name, mv_i16(num));
 			break;
 		case FT_POSITION:
-			pos = va_arg(argp, struct position_t);
-			map_set(packet->map, current_field->field_name, mv_pos(pos));
 			break;
 		case FT_BYTE:
-			num = va_arg(argp, i8);
-			map_set(packet->map, current_field->field_name, mv_i8(num));
 			break;
 		case FT_FLOAT:
-			f = va_arg(argp, float);
-			map_set(packet->map, current_field->field_name, mv_float(f));
 			break;
 		case FT_STRING:
 			ch = va_arg(argp, str);
-			ch = str_clone_str(ch);
 			map_set(packet->map, current_field->field_name, mv_str(ch));
 			break;
 		default:
@@ -735,8 +714,7 @@ struct packet_t* construct_clientbound_packet(const char* packet_type, ...)
 }
 void packet_free(struct packet_t* packet)
 {
-	map_destroy(packet->map);
-	mcsfree(packet);
+
 }
 buf make_varint(i32 varint)
 {
@@ -925,7 +903,6 @@ buf make_string(str str)
 		buf_append(&b, str.data[i]);
 	}
 
-	free(cstr);
 	return b;
 }
 buf make_varlong(i64 varlong)
