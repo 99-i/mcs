@@ -2,10 +2,8 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>
-#include <string.h>
 
-
-void* mcsalloc_(i32 s, const char* func)
+void* mcsalloc_(i32 s)
 {
 	void* m = malloc(s);
 	if(m == 0)
@@ -16,7 +14,7 @@ void* mcsalloc_(i32 s, const char* func)
 	return m;
 }
 
-void *mcsrealloc_(void *block, i32 s, const char* func)
+void *mcsrealloc_(void *block, i32 s)
 {
 	void* m = realloc(block, s);
 	if(m == 0)
@@ -27,7 +25,7 @@ void *mcsrealloc_(void *block, i32 s, const char* func)
 	return m;
 }
 
-void mcsfree_(void *block, const char* func)
+void mcsfree_(void *block)
 {
 	free(block);
 }

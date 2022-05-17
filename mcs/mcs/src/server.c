@@ -115,7 +115,7 @@ static void read_stream(uv_stream_t *stream, ssize_t nread, const uv_buf_t *read
 	handle_read(stream, handlebuf, false);
 	if (readbuf->base)
 	{
-		free(readbuf->base);
+		mcsfree(readbuf->base);
 	}
 }
 
