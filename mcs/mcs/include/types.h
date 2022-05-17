@@ -76,7 +76,7 @@ enum epacket_direction
 struct packet_t
 {
 	enum epacket_direction direction;
-	const char* type;
+	str type;
 	map map;
 };
 struct wraparound_t

@@ -5,6 +5,11 @@
 
 void* mcsalloc_(i32 s)
 {
+	if(!strcmp("map_set", func))
+	{
+		int j = 2;
+		j++;
+	}
 	void* m = malloc(s);
 	if(m == 0)
 	{
@@ -14,7 +19,7 @@ void* mcsalloc_(i32 s)
 	return m;
 }
 
-void *mcsrealloc_(void *block, i32 s)
+void *mcsrealloc_(void *block, i32 s, const char* func)
 {
 	void* m = realloc(block, s);
 	if(m == 0)
@@ -27,5 +32,8 @@ void *mcsrealloc_(void *block, i32 s)
 
 void mcsfree_(void *block)
 {
+	num_mallocs--;
+	total_allocated_memory -= _msize(block);
+	printf("just freed (a block the size of %lu) at %s. total is %ld.\n", _msize(block), func, total_allocated_memory);
 	free(block);
 }

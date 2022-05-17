@@ -117,7 +117,7 @@ typedef struct
 
 map map_construct()
 {
-	map_t* m = mcsalloc(sizeof(map_t));
+	map_t* m = mcsalloc(sizeof(map));
 	m->fields = 0;
 	m->fields_size = 0;
 
@@ -146,8 +146,9 @@ void map_set(map m, str s, map_value mv)
 	{
 		real->fields_size += 1;
 		real->fields = mcsrealloc(real->fields, ((u64)sizeof(struct map_field)) * real->fields_size);
+		real->fields[real->fields_size - 1].key = str_clone_str(s);
 	}
-	real->fields[real->fields_size - 1].key = str_clone_str(s);
+
 	real->fields[real->fields_size - 1].value = mv;
 }
 
@@ -162,7 +163,7 @@ map_value map_get_str(map m, str s)
 			return real->fields[i].value;
 		}
 	}
-	return mv_u64(-1);
+	return mv_u8(-1);
 }
 
 map_value map_get_cstr(map m, const char* s)
@@ -184,15 +185,9 @@ void map_destroy(map m)
 	i32 i;
 	for (i = 0; i < real->fields_size; i++)
 	{
-		if(real->fields->value.type == MAPTYPE_STRING)
-		{
-			str_destroy(&real->fields[i].value.str);
-		}
 		str_destroy(&real->fields[i].key);
 	}
-	if(real->fields_size != 0)
-	{
-		mcsfree(real->fields);
-	}
-	mcsfree(real);
+	free(real->fields);
+	real->fields = 0;
+	real->fields_size = 0;
 }

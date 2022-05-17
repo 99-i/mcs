@@ -2,6 +2,9 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#define mcsalloc(s) mcsalloc_(s, __FUNCTION__)
+#define mcsrealloc(b, s) mcsrealloc_(b, s, __FUNCTION__)
+#define mcsfree(s) mcsfree_(s, __FUNCTION__)
 typedef uint8_t		u8;
 typedef uint16_t	u16;
 typedef uint32_t	u32;
