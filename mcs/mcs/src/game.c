@@ -109,7 +109,7 @@ struct client_t *game_get_client(uv_tcp_t *socket)
 void game_handle_client_packet(struct client_t *client, struct packet_t *packet)
 {
 	assert(packet->direction == SERVERBOUND);
-	printf("received %s!\n", packet->type);
+	//printf("received %s!\n", packet->type);
 
 	if (!strcmp(packet->type, "Handshake"))
 	{
@@ -327,12 +327,12 @@ void game_handle_client_disconnect(uv_tcp_t *client)
 	client_array_remove(&game->server->clients, i);
 	mcsfree(removed_client);
 	uv_mutex_unlock(&lock);
+
 }
 
 static void sb_handle_handshake(struct client_t *client, struct packet_t *packet)
 {
 	i32 next_state;
-	i32 i;
 	assert((packet->direction == SERVERBOUND) && !strcmp(packet->type, "Handshake"));
 
 	next_state = map_get_cstr(packet->map, "Next State").i32;
@@ -378,7 +378,6 @@ static void sb_handle_ping(struct client_t *client, struct packet_t *packet)
 {
 	i64 ping = map_get_cstr(packet->map, "Payload").i64;
 
-	printf("received ping with payload %ld\n", ping);
 
 	struct packet_t *pong = construct_clientbound_packet("Pong", ping);
 

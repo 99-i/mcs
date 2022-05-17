@@ -39,7 +39,6 @@ void init_network_loop(void)
 
 static void on_new_connection(uv_stream_t *server, int status)
 {
-	printf("accepted client\n");
 	int result;
 	uv_tcp_t *client = mcsalloc(sizeof(uv_tcp_t));
 	uv_tcp_init(&network_loop, client);

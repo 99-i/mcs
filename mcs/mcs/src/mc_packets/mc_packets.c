@@ -97,7 +97,7 @@ void construct_slabs(void)
 	}
 
 
-
+	mcsfree(jsonstr);
 
 }
 enum epacket_direction bound_to_to_direction(char *str)
