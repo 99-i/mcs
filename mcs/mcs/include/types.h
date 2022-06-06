@@ -55,6 +55,7 @@ struct game_t
 	struct server_t *server;
 	world_array worlds;
 	i32 tick_count;
+	bool online;
 };
 struct packet_metadata_t
 {
@@ -76,7 +77,7 @@ enum epacket_direction
 struct packet_t
 {
 	enum epacket_direction direction;
-	str type;
+	const char* type;
 	map map;
 };
 struct wraparound_t

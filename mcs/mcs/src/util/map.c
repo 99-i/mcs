@@ -146,9 +146,9 @@ void map_set(map m, str s, map_value mv)
 	{
 		real->fields_size += 1;
 		real->fields = mcsrealloc(real->fields, ((u64)sizeof(struct map_field)) * real->fields_size);
-		real->fields[real->fields_size - 1].key = str_clone_str(s);
 	}
 
+	real->fields[real->fields_size - 1].key = str_clone_str(s);
 	real->fields[real->fields_size - 1].value = mv;
 }
 

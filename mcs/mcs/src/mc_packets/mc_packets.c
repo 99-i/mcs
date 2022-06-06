@@ -77,7 +77,7 @@ void construct_slabs(void)
 		slab.direction = bound_to_to_direction(cJSON_GetObjectItem(current_slab, "boundTo")->valuestring);
 		slab.state = state_str_to_state(cJSON_GetObjectItem(current_slab, "state")->valuestring);
 		slab.id = cJSON_GetObjectItem(current_slab, "id")->valueint;
-		slab.name = str_construct_from_cstr(cJSON_GetObjectItem(current_slab, "name")->valuestring);
+		slab.name = cJSON_GetObjectItem(current_slab, "name")->valuestring;
 
 		fields = cJSON_GetObjectItem(current_slab, "fields");
 
@@ -285,7 +285,7 @@ bool create_serverbound_packet(buf b, enum estate state, struct packet_t* packet
 		{
 			found_slab = true;
 			struct slab_t *slab = &slabinfo.slabs.fields[i];
-			packet->type = str_clone_str(slab->name);
+			packet->type = slab->name;
 			packet->map = map_construct();
 			packet->direction = SERVERBOUND;
 
@@ -641,16 +641,17 @@ struct packet_t* construct_clientbound_packet(const char* packet_type, ...)
 
 	for (i = 0; i < slabinfo.slabs.size; i++)
 	{
-		if (!streq_cstr(slabinfo.slabs.fields[i].name, packet_type))
+		if (!strcmp(slabinfo.slabs.fields[i].name, packet_type))
 		{
 			current_slab = &slabinfo.slabs.fields[i];
+			break;
 		}
 	}
 
 	assert(current_slab != 0);
 	assert(current_slab->direction == CLIENTBOUND);
 
-	packet->type = str_construct_from_cstr(packet_type);
+	packet->type = packet_type;
 	packet->map = map_construct();
 
 	i64 num;

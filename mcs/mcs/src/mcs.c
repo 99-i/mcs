@@ -18,6 +18,6 @@ struct game_t *construct_game(void)
 	g->tick_count = 0;
 	g->worlds = world_array_construct(0);
 	g->server = construct_server();
-
+	g->online = false;
 	return g;
 }

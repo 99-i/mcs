@@ -111,183 +111,183 @@ void game_handle_client_packet(struct client_t *client, struct packet_t *packet)
 	assert(packet->direction == SERVERBOUND);
 	printf("received %s!\n", packet->type);
 
-	if (streq_cstr(packet->type, "Handshake"))
+	if (!strcmp(packet->type, "Handshake"))
 	{
 		sb_handle_handshake(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Request"))
+	else if (!strcmp(packet->type, "Request"))
 	{
 		sb_handle_request(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Ping"))
+	else if (!strcmp(packet->type, "Ping"))
 	{
 		sb_handle_ping(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Login Start"))
+	else if (!strcmp(packet->type, "Login Start"))
 	{
 		sb_handle_login_start(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Teleport Confirm"))
+	else if (!strcmp(packet->type, "Teleport Confirm"))
 	{
 		sb_handle_teleport_confirm(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Query Block NBT"))
+	else if (!strcmp(packet->type, "Query Block NBT"))
 	{
 		sb_handle_query_block_nbt(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Set Difficulty"))
+	else if (!strcmp(packet->type, "Set Difficulty"))
 	{
 		sb_handle_set_difficulty(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Chat Message (serverbound)"))
+	else if (!strcmp(packet->type, "Chat Message (serverbound)"))
 	{
 		sb_handle_chat_message(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Client Status"))
+	else if (!strcmp(packet->type, "Client Status"))
 	{
 		sb_handle_client_status(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Client Settings"))
+	else if (!strcmp(packet->type, "Client Settings"))
 	{
 		sb_handle_client_settings(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Tab-Complete (serverbound)"))
+	else if (!strcmp(packet->type, "Tab-Complete (serverbound)"))
 	{
 		sb_handle_tab_complete(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Window Confirmation (serverbound)"))
+	else if (!strcmp(packet->type, "Window Confirmation (serverbound)"))
 	{
 		sb_handle_window_confirmation(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Click Window Button"))
+	else if (!strcmp(packet->type, "Click Window Button"))
 	{
 		sb_handle_click_window_button(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Close Window (serverbound)"))
+	else if (!strcmp(packet->type, "Close Window (serverbound)"))
 	{
 		sb_handle_close_window(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Query Entity NBT"))
+	else if (!strcmp(packet->type, "Query Entity NBT"))
 	{
 		sb_handle_query_entity_nbt(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Generate Structure"))
+	else if (!strcmp(packet->type, "Generate Structure"))
 	{
 		sb_handle_generate_structure(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Keep Alive (serverbound)"))
+	else if (!strcmp(packet->type, "Keep Alive (serverbound)"))
 	{
 		sb_handle_keep_alive(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Lock Difficulty"))
+	else if (!strcmp(packet->type, "Lock Difficulty"))
 	{
 		sb_handle_lock_difficulty(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Player Position"))
+	else if (!strcmp(packet->type, "Player Position"))
 	{
 		sb_handle_player_position(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Player Position And Rotation (serverbound)"))
+	else if (!strcmp(packet->type, "Player Position And Rotation (serverbound)"))
 	{
 		sb_handle_player_position_and_rotation(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Player Rotation"))
+	else if (!strcmp(packet->type, "Player Rotation"))
 	{
 		sb_handle_player_rotation(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Player Movement"))
+	else if (!strcmp(packet->type, "Player Movement"))
 	{
 		sb_handle_player_movement(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Vehicle Move (serverbound)"))
+	else if (!strcmp(packet->type, "Vehicle Move (serverbound)"))
 	{
 		sb_handle_vehicle_move(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Steer Boat"))
+	else if (!strcmp(packet->type, "Steer Boat"))
 	{
 		sb_handle_steer_boat(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Pick Item"))
+	else if (!strcmp(packet->type, "Pick Item"))
 	{
 		sb_handle_pick_item(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Craft Recipe Request"))
+	else if (!strcmp(packet->type, "Craft Recipe Request"))
 	{
 		sb_handle_craft_recipe_request(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Player Abilities (serverbound)"))
+	else if (!strcmp(packet->type, "Player Abilities (serverbound)"))
 	{
 		sb_handle_player_abilities(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Entity Action"))
+	else if (!strcmp(packet->type, "Entity Action"))
 	{
 		sb_handle_entity_action(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Steer Vehicle"))
+	else if (!strcmp(packet->type, "Steer Vehicle"))
 	{
 		sb_handle_steer_vehicle(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Set Recipe Book State"))
+	else if (!strcmp(packet->type, "Set Recipe Book State"))
 	{
 		sb_handle_set_recipe_book_state(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Set Displayed Recipe"))
+	else if (!strcmp(packet->type, "Set Displayed Recipe"))
 	{
 		sb_handle_set_displayed_recipe(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Name Item"))
+	else if (!strcmp(packet->type, "Name Item"))
 	{
 		sb_handle_name_item(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Resource Pack Status"))
+	else if (!strcmp(packet->type, "Resource Pack Status"))
 	{
 		sb_handle_resource_pack_status(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Select Trade"))
+	else if (!strcmp(packet->type, "Select Trade"))
 	{
 		sb_handle_select_trade(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Set Beacon Effect"))
+	else if (!strcmp(packet->type, "Set Beacon Effect"))
 	{
 		sb_handle_set_beacon_effect(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Held Item Change (serverbound)"))
+	else if (!strcmp(packet->type, "Held Item Change (serverbound)"))
 	{
 		sb_handle_held_item_change(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Update Command Block"))
+	else if (!strcmp(packet->type, "Update Command Block"))
 	{
 		sb_handle_update_command_block(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Update Command Block Minecart"))
+	else if (!strcmp(packet->type, "Update Command Block Minecart"))
 	{
 		sb_handle_update_command_block_minecart(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Update Jigsaw Block"))
+	else if (!strcmp(packet->type, "Update Jigsaw Block"))
 	{
 		sb_handle_update_jigsaw_block(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Update Structure Block"))
+	else if (!strcmp(packet->type, "Update Structure Block"))
 	{
 		sb_handle_update_structure_block(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Update Sign"))
+	else if (!strcmp(packet->type, "Update Sign"))
 	{
 		sb_handle_update_sign(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Animation (serverbound)"))
+	else if (!strcmp(packet->type, "Animation (serverbound)"))
 	{
 		sb_handle_animation(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Spectate"))
+	else if (!strcmp(packet->type, "Spectate"))
 	{
 		sb_handle_spectate(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Player Block Placement"))
+	else if (!strcmp(packet->type, "Player Block Placement"))
 	{
 		sb_handle_player_block_placement(client, packet);
 	}
-	else if (streq_cstr(packet->type, "Use Item"))
+	else if (!strcmp(packet->type, "Use Item"))
 	{
 		sb_handle_use_item(client, packet);
 	}
@@ -357,8 +357,8 @@ static void sb_handle_request(struct client_t *client, struct packet_t *packet)
 
 	const char* i = "{ \
 			\"version\": { \
-				\"name\": \"1.8.7\", \
-				\"protocol\": 47 \
+				\"name\": \"MCS\", \
+				\"protocol\": 754 \
 			}, \
 			\"players\": { \
 				\"max\": 100, \
@@ -368,24 +368,37 @@ static void sb_handle_request(struct client_t *client, struct packet_t *packet)
 				\"text\": \"Hello world\" \
 			} \
 		}";
-	
-	struct packet_t* response_packet = construct_clientbound_packet("Response", i);
+	str s = str_construct_from_cstr(i);
+	struct packet_t* response_packet = construct_clientbound_packet("Response", s);
 	server_send_packet(client, response_packet);
+	str_destroy(&s);
 
 	packet_free(response_packet);
 }
 static void sb_handle_ping(struct client_t *client, struct packet_t *packet)
 {
-	//map_value ping = map_get(packet->map, str_cstr_temp("Payload"));
+	i64 ping_payload = map_get_cstr(packet->map, "Payload").i64;
 
+	struct packet_t* pong_packet = construct_clientbound_packet("Pong", ping_payload);
 
+	server_send_packet(client, pong_packet);
+
+	packet_free(pong_packet);
 
 
 
 }
 static void sb_handle_login_start(struct client_t *client, struct packet_t *packet)
 {
-
+	if(game->online)
+	{
+		//TODO
+		UNIMPLEMENTED;
+	}
+	else
+	{
+		
+	}
 }
 static void sb_handle_teleport_confirm(struct client_t *client, struct packet_t *packet)
 {
