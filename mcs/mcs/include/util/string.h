@@ -21,4 +21,8 @@ bool streq_str(str s1, str s2);
 bool streq_cstr(str s1, const char* s2);
 void str_append_cstr(str *s1, const char* s2);
 void str_append_str(str *s1, str s2);
+void str_append_char(str *s1, char c);
+char str_getchar(str s1, i32 index);
 void str_destroy(str* s);
+bool str_starts_with_cstr(str check, const char* to_start_with);
+bool str_starts_with_str(str check, str to_start_with);

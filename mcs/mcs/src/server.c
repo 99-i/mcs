@@ -1,7 +1,6 @@
 #include "mcs.h"
 #include "mc_packets.h"
 #include "server.h"
-#include <curl/curl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -258,34 +257,73 @@ void server_send_packet(struct client_t* client, struct packet_t* packet)
 
 	uv_write(&context->req, (uv_stream_t*) client->socket, bufs, 3, on_write_end);
 }
-struct read_uuid_context
+
+#pragma pack(push, 1)
+struct request_context
 {
-	get_player_uuid_callback cb;
+	uv_connect_t *connect;
+	char* http_request;
+	get_request_callback callback;
 	void* data;
+	uv_tcp_t* socket;
 };
+#pragma pack(pop)
 
-// 'userdata' here is a pointer to a read_uuid_context that needs to be freed at the end of
-// the callback
-size_t write_callback(char *ptr, size_t size, size_t nmemb, void *userdata)
+void get_request_cb(uv_connect_t *req, int status)
 {
+	struct request_context* context = req;
 
-
+	uv_write_t write_req;
+	//wip
+	//uv_write(&write_req, )
 }
-
-// 'data' here can be a pointer to anything
-void server_get_player_uuid(str username, get_player_uuid_callback callback, void* data)
+void get_request(str url, get_request_callback callback, void *data)
 {
-	str api_url = str_construct_from_cstr("https://api.mojang.com/users/profiles/minecraft/");
-	str_append_str(&api_url, username);
-
-	CURL* req = curl_easy_init();
-	CURLcode res;
-
-	if(req)
+	char* req = mcsmalloc(sizeof(char) * 1024);
+	str path = str_construct();
+	str host = str_construct();
+	i32 i;
+	for(i = 0; i < url.size; i++)
 	{
-		char* url_cstr = str_cstr(api_url);
-		curl_easy_setopt(req, CURLOPT_URL, url_cstr);
-
+		if(str_getchar(url, i) != '/')
+		{
+			str_append_char(&host, str_getchar(url, i));
+		}
+		else
+		{
+			break;
+		}
+	}
+	for(; i < url.size; i++)
+	{
+		str_append_char(&path, str_getchar(url, i));
 	}
 
+	char* path_cstr = str_cstr(path);
+	char* host_cstr = str_cstr(host);
+
+	snprintf(req, 1024, "GET %s HTTP/1.1\r\nHost: %s\r\n", path_cstr, host_cstr);
+
+	uv_tcp_t* socket = mcsmalloc(sizeof(uv_tcp_t));
+	uv_tcp_init(&network_loop, socket);
+
+	uv_connect_t* connect = mcsmalloc(sizeof(uv_connect_t));
+
+	struct sockaddr_in dest;
+	uv_ip4_addr(host_cstr, 80, &dest);
+
+	struct request_context* context = mcsmalloc(sizeof(struct request_context));
+	
+	context->callback = callback;
+	context->data = data;
+	context->connect = connect;
+	context->http_request = req;
+	context->socket = socket;
+	uv_tcp_connect(context, socket, &dest, get_request_cb);
+
+	mcsfree(path_cstr);
+	mcsfree(host_cstr);
 }
+
+
+void server_get_player_uuid(str username, get_player_uuid_callback callback, void* data);
