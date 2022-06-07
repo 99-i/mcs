@@ -1,5 +1,7 @@
 #include "mcs.h"
 #include "mc_packets.h"
+#include "server.h"
+#include <curl/curl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -139,10 +141,10 @@ void on_write_end(uv_write_t* req, int status)
 	struct write_context* context = (struct write_context*) req;
 	for(i32 i = 0; i < 3; i++)
 	{
-		free(context->bufs[i].base);
+		mcsfree(context->bufs[i].base);
 	}
-	free(context->bufs);
-	free(context);
+	mcsfree(context->bufs);
+	mcsfree(context);
 }
 
 void server_send_packet(struct client_t* client, struct packet_t* packet)
@@ -247,9 +249,7 @@ void server_send_packet(struct client_t* client, struct packet_t* packet)
 	bufs[2].base = mcsalloc(sizeof(char) * bufs[2].len);
 
 	memcpy(bufs[0].base, length.data, length.size);
-
 	memcpy(bufs[1].base, id.data, id.size);
-
 	memcpy(bufs[2].base, data.data, data.size);
 
 	context = mcsalloc(sizeof(struct write_context));
@@ -258,5 +258,34 @@ void server_send_packet(struct client_t* client, struct packet_t* packet)
 
 	uv_write(&context->req, (uv_stream_t*) client->socket, bufs, 3, on_write_end);
 }
+struct read_uuid_context
+{
+	get_player_uuid_callback cb;
+	void* data;
+};
+
+// 'userdata' here is a pointer to a read_uuid_context that needs to be freed at the end of
+// the callback
+size_t write_callback(char *ptr, size_t size, size_t nmemb, void *userdata)
+{
 
 
+}
+
+// 'data' here can be a pointer to anything
+void server_get_player_uuid(str username, get_player_uuid_callback callback, void* data)
+{
+	str api_url = str_construct_from_cstr("https://api.mojang.com/users/profiles/minecraft/");
+	str_append_str(&api_url, username);
+
+	CURL* req = curl_easy_init();
+	CURLcode res;
+
+	if(req)
+	{
+		char* url_cstr = str_cstr(api_url);
+		curl_easy_setopt(req, CURLOPT_URL, url_cstr);
+
+	}
+
+}

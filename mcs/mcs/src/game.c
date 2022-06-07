@@ -56,6 +56,11 @@ static void sb_handle_player_block_placement(struct client_t *client, struct pac
 static void sb_handle_use_item(struct client_t *client, struct packet_t *packet);
 #pragma endregion
 
+struct handle_context
+{
+	struct client_t* client;
+	struct packet_t* packet;
+};
 static void timer_callback(uv_timer_t *handle)
 {
 	assert(handle == &timer);
@@ -388,6 +393,10 @@ static void sb_handle_ping(struct client_t *client, struct packet_t *packet)
 
 
 }
+static void after_login_start(struct uuid_t uuid, void *data)
+{
+
+}
 static void sb_handle_login_start(struct client_t *client, struct packet_t *packet)
 {
 	if(game->online)
@@ -397,7 +406,12 @@ static void sb_handle_login_start(struct client_t *client, struct packet_t *pack
 	}
 	else
 	{
-		
+		struct handle_context* context = mcsalloc(sizeof(struct handle_context));
+
+		context->client = client;
+		context->packet = packet;
+		str username = map_get_cstr(packet->map, "Name").str;
+		server_get_player_uuid(username, after_login_start, context);
 	}
 }
 static void sb_handle_teleport_confirm(struct client_t *client, struct packet_t *packet)

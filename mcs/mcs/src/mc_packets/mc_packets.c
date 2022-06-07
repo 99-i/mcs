@@ -791,27 +791,17 @@ buf make_uuid(struct uuid_t uuid)
 	buf_append(&buf, (u8) ((uuid.low & 0xFF00) >> 8));
 	buf_append(&buf, (u8) ((uuid.low & 0xFF)));
 
-	
-	
-
 	return buf;
 }
 buf make_boolean(bool boolean)
 {
 	buf buf = buf_construct();
-	
-
 	buf_append(&buf, boolean);
-
-	
-	
-
 	return buf;
 }
 buf make_double(double d)
 {
 	buf buf = buf_construct();
-	
 	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF00000000000000) >> 56));
 	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF000000000000) >> 48));
 	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF0000000000) >> 40));
@@ -820,61 +810,39 @@ buf make_double(double d)
 	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF0000) >> 16));
 	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF00) >> 8));
 	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF)));
-	
-	
 	return buf;
 }
 buf make_angle(u8 angle)
 {
 	buf buf = buf_construct();
-	
-
 	buf_append(&buf, angle);
-	
-	
-
 	return buf;
 }
 buf make_i32(i32 integer)
 {
 	buf buf = buf_construct();
-	
-
 	buf_append(&buf, (integer & 0xff000000) >> 24);
 	buf_append(&buf, (integer & 0xff0000) >> 16);
 	buf_append(&buf, (integer & 0xff00) >> 8);
 	buf_append(&buf, (integer & 0xff));
-
-	
-	
-
 	return buf;
 }
 buf make_i16(i16 s)
 {
 	buf buf = buf_construct();
-
 	buf_append(&buf, (s & 0xff00) >> 8);
 	buf_append(&buf, (s & 0xff));
-
-	
-	
-
 	return buf;
-
 }
 buf make_position(struct position_t pos)
 {
 	i64 int_pos = 0;
-
 	pos.x &= 0x3ffffff;
 	pos.z &= 0x3ffffff;
 	pos.y &= 0xfff;
 	int_pos |= (i64)pos.x << (64 - 26);
 	int_pos |= (i64)pos.z << (64 - 26 - 26);
 	int_pos |= (i64)pos.y;
-
-
 	return make_i64(int_pos);
 }
 buf make_i8(i8 byte)
