@@ -4,13 +4,11 @@
 #include "mcs.h"
 #include "mc_packets.h"
 #include <stddef.h>
-#include <curl/curl.h>
 
 struct game_t *game;
 uv_mutex_t lock;
 int main()
 {
-	curl_global_init(CURL_GLOBAL_ALL);
 	game = construct_game();
 	uv_mutex_init(&lock);
 
