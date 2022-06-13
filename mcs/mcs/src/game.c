@@ -353,6 +353,7 @@ static void sb_handle_handshake(struct client_t *client, struct packet_t *packet
 			client->state = STATE_LOGIN;
 			break;
 		default:
+			assert(false && "unreachable.");
 			break;
 	}
 
@@ -374,7 +375,7 @@ static void sb_handle_request(struct client_t *client, struct packet_t *packet)
 			} \
 		}";
 	str s = str_construct_from_cstr(i);
-	struct packet_t* response_packet = construct_clientbound_packet("Response", s);
+	struct packet_t* response_packet = construct_clientbound_packet(STATE_STATUS, "Response", s);
 	server_send_packet(client, response_packet);
 	str_destroy(&s);
 
@@ -384,7 +385,7 @@ static void sb_handle_ping(struct client_t *client, struct packet_t *packet)
 {
 	i64 ping_payload = map_get_cstr(packet->map, "Payload").i64;
 
-	struct packet_t* pong_packet = construct_clientbound_packet("Pong", ping_payload);
+	struct packet_t* pong_packet = construct_clientbound_packet(STATE_STATUS, "Pong", ping_payload);
 
 	server_send_packet(client, pong_packet);
 
@@ -406,12 +407,12 @@ static void sb_handle_login_start(struct client_t *client, struct packet_t *pack
 	}
 	else
 	{
-		struct handle_context* context = mcsalloc(sizeof(struct handle_context));
+		//struct handle_context* context = mcsalloc(sizeof(struct handle_context));
 
-		context->client = client;
-		context->packet = packet;
-		str username = map_get_cstr(packet->map, "Name").str;
-		server_get_player_uuid(username, after_login_start, context);
+		//context->client = client;
+		//context->packet = packet;
+		//str username = map_get_cstr(packet->map, "Name").str;
+		//server_get_player_uuid(username, after_login_start, context);
 	}
 }
 static void sb_handle_teleport_confirm(struct client_t *client, struct packet_t *packet)

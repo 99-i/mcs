@@ -45,7 +45,7 @@ struct packet_metadata_t get_packet_metadata(buf b)
 
 	return (struct packet_metadata_t)
 	{
-		(i32)id, (i32)length
+		(i32) id, (i32) length
 	};
 }
 enum epacket_direction bound_to_to_direction(char *str);
@@ -53,7 +53,7 @@ enum estate state_str_to_state(char *str);
 enum efield_type field_str_to_field_type(char *str);
 void construct_slabs(void)
 {
-	char* jsonstr;
+	char *jsonstr;
 	cJSON *all;
 	cJSON *current_slab;
 	cJSON *fields;
@@ -72,7 +72,7 @@ void construct_slabs(void)
 
 	slabinfo.slabs = slab_array_construct(num_slabs);
 
-	for (i = 0; i < num_slabs; i++)
+	for(i = 0; i < num_slabs; i++)
 	{
 		slab.direction = bound_to_to_direction(cJSON_GetObjectItem(current_slab, "boundTo")->valuestring);
 		slab.state = state_str_to_state(cJSON_GetObjectItem(current_slab, "state")->valuestring);
@@ -85,7 +85,7 @@ void construct_slabs(void)
 
 		slab.fields = slab_field_array_construct(num_fields);
 
-		for (j = 0; j < num_fields; j++)
+		for(j = 0; j < num_fields; j++)
 		{
 			field.field_name = str_construct_from_cstr(cJSON_GetObjectItem(cJSON_GetArrayItem(fields, j), "fieldName")->valuestring);
 			field.type = field_str_to_field_type(cJSON_GetObjectItem(cJSON_GetArrayItem(fields, j), "fieldType")->valuestring);
@@ -102,11 +102,11 @@ void construct_slabs(void)
 }
 enum epacket_direction bound_to_to_direction(char *str)
 {
-	if (!strcmp(str, "Server"))
+	if(!strcmp(str, "Server"))
 	{
 		return SERVERBOUND;
 	}
-	else if (!strcmp(str, "Client"))
+	else if(!strcmp(str, "Client"))
 	{
 		return CLIENTBOUND;
 	}
@@ -114,19 +114,19 @@ enum epacket_direction bound_to_to_direction(char *str)
 }
 enum estate state_str_to_state(char *str)
 {
-	if (!strcmp(str, "Handshaking"))
+	if(!strcmp(str, "Handshaking"))
 	{
 		return STATE_HANDSHAKING;
 	}
-	else if (!strcmp(str, "Status"))
+	else if(!strcmp(str, "Status"))
 	{
 		return STATE_STATUS;
 	}
-	else if (!strcmp(str, "Login"))
+	else if(!strcmp(str, "Login"))
 	{
 		return STATE_LOGIN;
 	}
-	else if (!strcmp(str, "Play"))
+	else if(!strcmp(str, "Play"))
 	{
 		return STATE_PLAY;
 	}
@@ -135,109 +135,113 @@ enum estate state_str_to_state(char *str)
 }
 enum efield_type field_str_to_field_type(char *str)
 {
-	if (!strcmp(str, "VarInt"))
+	if(!strcmp(str, "VarInt"))
 	{
 		return FT_VARINT;
 	}
-	else if (!strcmp(str, "Unsigned Short"))
+	else if(!strcmp(str, "Unsigned Short"))
 	{
 		return FT_UNSIGNED_SHORT;
 	}
-	else if (!strcmp(str, "Unsigned Byte"))
+	else if(!strcmp(str, "Unsigned Byte"))
 	{
 		return FT_UNSIGNED_BYTE;
 	}
-	else if (!strcmp(str, "Long"))
+	else if(!strcmp(str, "Long"))
 	{
 		return FT_LONG;
 	}
-	else if (!strcmp(str, "Chat"))
+	else if(!strcmp(str, "Chat"))
 	{
 		return FT_STRING;
 	}
-	else if (!strcmp(str, "UUID"))
+	else if(!strcmp(str, "UUID"))
 	{
 		return FT_UUID;
 	}
-	else if (!strcmp(str, "Identifier"))
+	else if(!strcmp(str, "Identifier"))
 	{
 		return FT_STRING;
 	}
-	else if (!strcmp(str, "Boolean"))
+	else if(!strcmp(str, "Boolean"))
 	{
 		return FT_BOOLEAN;
 	}
-	else if (!strcmp(str, "Double"))
+	else if(!strcmp(str, "Double"))
 	{
 		return FT_DOUBLE;
 	}
-	else if (!strcmp(str, "Angle"))
+	else if(!strcmp(str, "Angle"))
 	{
 		return FT_ANGLE;
 	}
-	else if (!strcmp(str, "Int"))
+	else if(!strcmp(str, "Int"))
 	{
 		return FT_INT;
 	}
-	else if (!strcmp(str, "Short"))
+	else if(!strcmp(str, "Short"))
 	{
 		return FT_SHORT;
 	}
-	else if (!strcmp(str, "Position"))
+	else if(!strcmp(str, "Position"))
 	{
 		return FT_POSITION;
 	}
-	else if (!strcmp(str, "Byte"))
+	else if(!strcmp(str, "Byte"))
 	{
 		return FT_BYTE;
 	}
-	else if (!strcmp(str, "Float"))
+	else if(!strcmp(str, "Float"))
 	{
 		return FT_FLOAT;
 	}
-	else if (!strcmp(str, "String (16)"))
+	else if(!strcmp(str, "String (16)"))
 	{
 		return FT_STRING;
 	}
-	else if (!strcmp(str, "String (20)"))
+	else if(!strcmp(str, "String (20)"))
 	{
 		return FT_STRING;
 	}
-	else if (!strcmp(str, "String (40)"))
+	else if(!strcmp(str, "String (40)"))
 	{
 		return FT_STRING;
 	}
-	else if (!strcmp(str, "String (255)"))
+	else if(!strcmp(str, "String (255)"))
 	{
 		return FT_STRING;
 	}
-	else if (!strcmp(str, "String (256)"))
+	else if(!strcmp(str, "String (256)"))
 	{
 		return FT_STRING;
 	}
-	else if (!strcmp(str, "String (384)"))
+	else if(!strcmp(str, "String (384)"))
 	{
 		return FT_STRING;
 	}
-	else if (!strcmp(str, "String (32500)"))
+	else if(!strcmp(str, "String (32500)"))
 	{
 		return FT_STRING;
 	}
-	else if (!strcmp(str, "String (32767)"))
+	else if(!strcmp(str, "String (32767)"))
 	{
 		return FT_STRING;
 	}
-	else if (!strcmp(str, "String"))
+	else if(!strcmp(str, "String"))
 	{
 		return FT_STRING;
 	}
-	else if (!strcmp(str, "VarLong"))
+	else if(!strcmp(str, "VarLong"))
 	{
 		return FT_VARLONG;
 	}
-	else if (!strcmp(str, "VarInt Enum"))
+	else if(!strcmp(str, "VarInt Enum"))
 	{
 		return FT_VARINT;
+	}
+	else if(!strcmp(str, "Byte Enum"))
+	{
+		return FT_BYTE;
 	}
 	assert(false && "unreachable");
 	return -1;
@@ -248,7 +252,7 @@ bool should_wraparound(buf b, struct wraparound_t *cutoff)
 	i32 length_size;
 	length_size = read_varint(b, &length);
 
-	if (b.size - length_size > length)
+	if(b.size - length_size > length)
 	{
 		cutoff->cutoff = length_size + length;
 		cutoff->first_size = length_size + length;
@@ -258,7 +262,18 @@ bool should_wraparound(buf b, struct wraparound_t *cutoff)
 
 	return false;
 }
-bool create_serverbound_packet(buf b, enum estate state, struct packet_t* packet)
+
+
+bool create_sb_click_window(buf b, enum estate state, struct packet_t *packet);
+bool create_sb_plugin_message(buf b, enum estate state, struct packet_t *packet);
+bool create_sb_edit_book(buf b, enum estate state, struct packet_t *packet);
+bool create_sb_interact_entity(buf b, enum estate state, struct packet_t *packet);
+bool create_sb_player_digging(buf b, enum estate state, struct packet_t *packet);
+bool create_sb_advancement_tab(buf b, enum estate state, struct packet_t *packet);
+bool create_sb_creative_inventory_action(buf b, enum estate state, struct packet_t *packet);
+
+
+bool create_serverbound_packet(buf b, enum estate state, struct packet_t *packet)
 {
 	i32 i;
 	i32 j;
@@ -268,6 +283,8 @@ bool create_serverbound_packet(buf b, enum estate state, struct packet_t* packet
 	i32 data_needle = 0;
 	data_needle += read_varint(b, 0);
 	sliced = buf_slice_from_buf(b, data_needle, b.size);
+
+
 	data_needle += read_varint(sliced, 0);
 
 
@@ -279,9 +296,9 @@ bool create_serverbound_packet(buf b, enum estate state, struct packet_t* packet
 	struct position_t pos;
 	float f;
 
-	for (i = 0; i < slabinfo.slabs.size; i++)
+	for(i = 0; i < slabinfo.slabs.size; i++)
 	{
-		if (slabinfo.slabs.fields[i].state == state && slabinfo.slabs.fields[i].id == metadata.packet_id && slabinfo.slabs.fields[i].direction == SERVERBOUND)
+		if(slabinfo.slabs.fields[i].state == state && slabinfo.slabs.fields[i].id == metadata.packet_id && slabinfo.slabs.fields[i].direction == SERVERBOUND)
 		{
 			found_slab = true;
 			struct slab_t *slab = &slabinfo.slabs.fields[i];
@@ -289,93 +306,136 @@ bool create_serverbound_packet(buf b, enum estate state, struct packet_t* packet
 			packet->map = map_construct();
 			packet->direction = SERVERBOUND;
 
-			for (j = 0; j < slab->fields.size; j++)
+			for(j = 0; j < slab->fields.size; j++)
 			{
-				switch (slab->fields.fields[j].type)
+				switch(slab->fields.fields[j].type)
 				{
 					case FT_VARINT:
-						READY_SLICED_BUFFER();
-						data_needle += read_varint(sliced, (i32*) &num);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_i32((i32) num));
-						break;
+					READY_SLICED_BUFFER();
+					data_needle += read_varint(sliced, (i32 *) &num);
+					map_set(packet->map, slab->fields.fields[j].field_name, mv_i32((i32) num));
+					break;
 					case FT_UNSIGNED_SHORT:
-						READY_SLICED_BUFFER();
-						data_needle += read_u16(sliced, (i32*) &num);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_u16((u16) num));
-						break;
+					READY_SLICED_BUFFER();
+					data_needle += read_u16(sliced, (i32 *) &num);
+					map_set(packet->map, slab->fields.fields[j].field_name, mv_u16((u16) num));
+					break;
 					case FT_UNSIGNED_BYTE:
-						READY_SLICED_BUFFER();
-						data_needle += read_u8(sliced, (i32*) &num);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_u8((u8) num));
-						break;
+					READY_SLICED_BUFFER();
+					data_needle += read_u8(sliced, (i32 *) &num);
+					map_set(packet->map, slab->fields.fields[j].field_name, mv_u8((u8) num));
+					break;
 					case FT_LONG:
-						READY_SLICED_BUFFER();
-						data_needle += read_i64(sliced, &num);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_i64(num));
-						break;
+					READY_SLICED_BUFFER();
+					data_needle += read_i64(sliced, &num);
+					map_set(packet->map, slab->fields.fields[j].field_name, mv_i64(num));
+					break;
 					case FT_UUID:
-						READY_SLICED_BUFFER();
-						data_needle += read_uuid(sliced, &uuid);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_uuid(uuid));
-						break;
+					READY_SLICED_BUFFER();
+					data_needle += read_uuid(sliced, &uuid);
+					map_set(packet->map, slab->fields.fields[j].field_name, mv_uuid(uuid));
+					break;
 					case FT_BOOLEAN:
-						READY_SLICED_BUFFER();
-						data_needle += read_bool(sliced, &the_bool);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_u8(the_bool));
-						break;
+					READY_SLICED_BUFFER();
+					data_needle += read_bool(sliced, &the_bool);
+					map_set(packet->map, slab->fields.fields[j].field_name, mv_u8(the_bool));
+					break;
 					case FT_DOUBLE:
-						READY_SLICED_BUFFER();
-						data_needle += read_double(sliced, &d);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_double(d));
-						break;
+					READY_SLICED_BUFFER();
+					data_needle += read_double(sliced, &d);
+					map_set(packet->map, slab->fields.fields[j].field_name, mv_double(d));
+					break;
 					case FT_ANGLE:
-						READY_SLICED_BUFFER();
-						data_needle += read_u8(sliced, (i32*) &num);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_u8((u8) num));
-						break;
+					READY_SLICED_BUFFER();
+					data_needle += read_u8(sliced, (i32 *) &num);
+					map_set(packet->map, slab->fields.fields[j].field_name, mv_u8((u8) num));
+					break;
 					case FT_INT:
-						READY_SLICED_BUFFER();
-						data_needle += read_i32(sliced, (i32*) &num);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_i32((i32) num));
-						break;
+					READY_SLICED_BUFFER();
+					data_needle += read_i32(sliced, (i32 *) &num);
+					map_set(packet->map, slab->fields.fields[j].field_name, mv_i32((i32) num));
+					break;
 					case FT_SHORT:
-						READY_SLICED_BUFFER();
-						data_needle += read_i16(sliced, (i32*) &num);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_i16((i16) num));
-						break;
+					READY_SLICED_BUFFER();
+					data_needle += read_i16(sliced, (i32 *) &num);
+					map_set(packet->map, slab->fields.fields[j].field_name, mv_i16((i16) num));
+					break;
 					case FT_POSITION:
-						READY_SLICED_BUFFER();
-						data_needle += read_position(sliced, &pos);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_pos(pos));
-						break;
+					READY_SLICED_BUFFER();
+					data_needle += read_position(sliced, &pos);
+					map_set(packet->map, slab->fields.fields[j].field_name, mv_pos(pos));
+					break;
 					case FT_BYTE:
-						READY_SLICED_BUFFER();
-						data_needle += read_i8(sliced, (i32*) &num);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_i8((i8) num));
-						break;
+					READY_SLICED_BUFFER();
+					data_needle += read_i8(sliced, (i32 *) &num);
+					map_set(packet->map, slab->fields.fields[j].field_name, mv_i8((i8) num));
+					break;
 					case FT_FLOAT:
-						READY_SLICED_BUFFER();
-						data_needle += read_float(sliced, &f);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_float(f));
-						break;
+					READY_SLICED_BUFFER();
+					data_needle += read_float(sliced, &f);
+					map_set(packet->map, slab->fields.fields[j].field_name, mv_float(f));
+					break;
 					case FT_STRING:
-						READY_SLICED_BUFFER();
-						data_needle += read_str(sliced, &string);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_str(string));
-						break;
+					READY_SLICED_BUFFER();
+					data_needle += read_str(sliced, &string);
+					map_set(packet->map, slab->fields.fields[j].field_name, mv_str(string));
+					break;
 					case FT_VARLONG:
-						READY_SLICED_BUFFER();
-						data_needle += read_varlong(sliced, &num);
-						map_set(packet->map, slab->fields.fields[j].field_name, mv_i64(num));
-						break;
+					READY_SLICED_BUFFER();
+					data_needle += read_varlong(sliced, &num);
+					map_set(packet->map, slab->fields.fields[j].field_name, mv_i64(num));
+					break;
 					default:
-						break;
+					break;
 				}
 			}
 
 			break;
 		}
 	}
+
+
+	if(!found_slab)
+	{
+		switch(state)
+		{
+			case STATE_PLAY:
+			switch(metadata.packet_id)
+			{
+				case 0x09:
+				//Click Window
+				return create_sb_click_window(b, state, packet);
+				break;
+				case 0x0B:
+				//Plugin Message (serverbound)
+				return create_sb_plugin_message(b, state, packet);
+				break;
+				case 0x0C:
+				//Edit Book
+				return create_sb_edit_book(b, state, packet);
+				break;
+				case 0x0E:
+				//Interact Entity
+				return create_sb_interact_entity(b, state, packet);
+				break;
+				case 0x1B:
+				//Player Digging
+				return create_sb_player_digging(b, state, packet);
+				break;
+				case 0x22:
+				//Advancement Tab
+				return create_sb_advancement_tab(b, state, packet);
+				break;
+				case 0x28:
+				//Creative Inventory Action
+				return create_sb_creative_inventory_action(b, state, packet);
+				break;
+			}
+			break;
+		}
+	}
+
+
 	return found_slab;
 }
 static i32 read_varint(buf b, i32 *dest)
@@ -391,16 +451,16 @@ static i32 read_varint(buf b, i32 *dest)
 
 		decoded_int |= (current_byte & 0b01111111) << bit_offset;
 
-		if (bit_offset == 35)
+		if(bit_offset == 35)
 		{
 			return 0;
 			break;
 		}
 		bit_offset += 7;
 		len++;
-	} while ((current_byte & 0b10000000) != 0);
+	} while((current_byte & 0b10000000) != 0);
 
-	if (dest)
+	if(dest)
 	{
 		*dest = decoded_int;
 	}
@@ -408,7 +468,7 @@ static i32 read_varint(buf b, i32 *dest)
 }
 static i32 read_u16(buf b, i32 *dest)
 {
-	if (b.size < 2)
+	if(b.size < 2)
 	{
 		return 0;
 	}
@@ -418,7 +478,7 @@ static i32 read_u16(buf b, i32 *dest)
 }
 static i32 read_u8(buf b, i32 *dest)
 {
-	if (b.size < 1)
+	if(b.size < 1)
 	{
 		return 0;
 	}
@@ -427,19 +487,19 @@ static i32 read_u8(buf b, i32 *dest)
 }
 static i32 read_i64(buf b, i64 *dest)
 {
-	if (b.size < 8)
+	if(b.size < 8)
 	{
 		return 0;
 	}
 	*dest = 0;
-	*dest = (((u64)b.data[0]) << 56) |
-			(((u64)b.data[1]) << 48) |
-			(((u64)b.data[2]) << 40) |
-			(((u64)b.data[3]) << 32) |
-			(((u64)b.data[4]) << 24) |
-			(((u64)b.data[5]) << 16) |
-			(((u64)b.data[6]) << 8) |
-			(((u64)b.data[7]) << 0);
+	*dest = (((u64) b.data[0]) << 56) |
+		(((u64) b.data[1]) << 48) |
+		(((u64) b.data[2]) << 40) |
+		(((u64) b.data[3]) << 32) |
+		(((u64) b.data[4]) << 24) |
+		(((u64) b.data[5]) << 16) |
+		(((u64) b.data[6]) << 8) |
+		(((u64) b.data[7]) << 0);
 	return 8;
 }
 static i32 read_uuid(buf b, struct uuid_t *dest)
@@ -447,7 +507,7 @@ static i32 read_uuid(buf b, struct uuid_t *dest)
 	u64 high;
 	u64 low;
 	buf sliced;
-	if (b.size < 16)
+	if(b.size < 16)
 	{
 		return 0;
 	}
@@ -459,11 +519,11 @@ static i32 read_uuid(buf b, struct uuid_t *dest)
 }
 static i32 read_bool(buf b, bool *dest)
 {
-	if (b.size < 1)
+	if(b.size < 1)
 	{
 		return 0;
 	}
-	if (dest)
+	if(dest)
 	{
 		*dest = !!b.data[0];
 	}
@@ -472,25 +532,25 @@ static i32 read_bool(buf b, bool *dest)
 static i32 read_double(buf b, double *dest)
 {
 	u64 holder;
-	if (b.size < 8)
+	if(b.size < 8)
 	{
 		return 0;
 	}
 	read_u64(b, &holder);
 
-	if (dest)
+	if(dest)
 	{
-		*dest = *(double *)&holder;
+		*dest = *(double *) &holder;
 	}
 	return 8;
 }
 static i32 read_i32(buf b, i32 *dest)
 {
-	if (b.size < 4)
+	if(b.size < 4)
 	{
 		return 0;
 	}
-	if (dest)
+	if(dest)
 	{
 		*dest = 0;
 		*dest = (b.data[0] << 24) | (b.data[1] << 16) | (b.data[2] << 8) | b.data[3];
@@ -499,11 +559,11 @@ static i32 read_i32(buf b, i32 *dest)
 }
 static i32 read_i16(buf b, i32 *dest)
 {
-	if (b.size < 2)
+	if(b.size < 2)
 	{
 		return 0;
 	}
-	if (dest)
+	if(dest)
 	{
 
 		*dest = 0;
@@ -514,12 +574,12 @@ static i32 read_i16(buf b, i32 *dest)
 static i32 read_position(buf b, struct position_t *dest)
 {
 	u64 l;
-	if (b.size < 8)
+	if(b.size < 8)
 	{
 		return 0;
 	}
 	read_u64(b, &l);
-	if (dest)
+	if(dest)
 	{
 
 		dest->x = (l >> 38);
@@ -532,43 +592,43 @@ static i32 read_position(buf b, struct position_t *dest)
 static i32 read_u64(buf b, u64 *dest)
 {
 	i64 l;
-	if (b.size < 8)
+	if(b.size < 8)
 	{
 		return 0;
 	}
 	read_i64(b, &l);
 
-	if (dest)
+	if(dest)
 	{
-		*dest = *((u64 *)&l);
+		*dest = *((u64 *) &l);
 	}
 	return 8;
 }
 static i32 read_i8(buf b, i32 *dest)
 {
 	i32 l;
-	if (b.size < 1)
+	if(b.size < 1)
 	{
 		return 0;
 	}
 	read_u8(b, &l);
 
-	if (dest)
+	if(dest)
 	{
-		*dest = *((i8 *)&l);
+		*dest = *((i8 *) &l);
 	}
 	return 1;
 }
 static i32 read_float(buf b, float *dest)
 {
 	i32 f;
-	if (b.size < 4)
+	if(b.size < 4)
 	{
 		return 0;
 	}
 	read_i32(b, &f);
 
-	*dest = *((float*) &f);
+	*dest = *((float *) &f);
 
 	return 4;
 }
@@ -579,14 +639,14 @@ static i32 read_str(buf b, str *dest)
 	char *str;
 	i32 varint_length;
 	varint_length = read_varint(b, &strlength);
-	if (strlength > 32767)
+	if(strlength > 32767)
 	{
 		return 0;
 	}
 	str = mcsalloc(sizeof(char) * (strlength + 1));
-	for (i = 0; i < strlength; i++)
+	for(i = 0; i < strlength; i++)
 	{
-		if (i + varint_length > b.size)
+		if(i + varint_length > b.size)
 		{
 			free(str);
 			return 0;
@@ -608,28 +668,28 @@ static i32 read_varlong(buf b, i64 *dest)
 	{
 		current_byte = b.data[len];
 
-		decoded_long |= (((u64)(current_byte & 0b01111111)) << bit_offset);
+		decoded_long |= (((u64) (current_byte & 0b01111111)) << bit_offset);
 
-		if (bit_offset == 50)
+		if(bit_offset == 50)
 		{
 			return 0;
 			break;
 		}
 		bit_offset += 7;
 		len++;
-	} while ((current_byte & 0b10000000) != 0);
+	} while((current_byte & 0b10000000) != 0);
 
-	if (dest)
+	if(dest)
 	{
 		*dest = decoded_long;
 	}
 	return len;
 }
-struct packet_t* construct_clientbound_packet(const char* packet_type, ...)
+struct packet_t *construct_clientbound_packet(enum estate state, const char *packet_type, ...)
 {
-	struct packet_t* packet = mcsalloc(sizeof(struct packet_t));
-	struct slab_t* current_slab = 0;
-	struct field_t* current_field = 0;
+	struct packet_t *packet = mcsalloc(sizeof(struct packet_t));
+	struct slab_t *current_slab = 0;
+	struct field_t *current_field = 0;
 
 	va_list argp;
 
@@ -639,12 +699,155 @@ struct packet_t* construct_clientbound_packet(const char* packet_type, ...)
 
 	packet->direction = CLIENTBOUND;
 
-	for (i = 0; i < slabinfo.slabs.size; i++)
+	for(i = 0; i < slabinfo.slabs.size; i++)
 	{
-		if (!strcmp(slabinfo.slabs.fields[i].name, packet_type))
+		if(!strcmp(slabinfo.slabs.fields[i].name, packet_type))
 		{
-			current_slab = &slabinfo.slabs.fields[i];
-			break;
+			if(slabinfo.slabs.fields[i].state == state)
+			{
+				current_slab = &slabinfo.slabs.fields[i];
+				break;
+			}
+		}
+	}
+
+	if(current_slab == 0)
+	{
+		if(!strcmp(packet_type, "Statistics"))
+		{
+			//Statistics
+		}
+		else if(!strcmp(packet_type, "Block Entity Data"))
+		{
+			//Block Entity Data
+		}
+		else if(!strcmp(packet_type, "Boss Bar"))
+		{
+			//Boss Bar
+		}
+		else if(!strcmp(packet_type, "Declare Commands"))
+		{
+			//Declare Commands
+		}
+		else if(!strcmp(packet_type, "Window Items"))
+		{
+			//Window Items
+		}
+		else if(!strcmp(packet_type, "Set Slot"))
+		{
+			//Set Slot
+		}
+		else if(!strcmp(packet_type, "Plugin Message (clientbound)"))
+		{
+			//Plugin Message (clientbound)
+		}
+		else if(!strcmp(packet_type, "Entity Status"))
+		{
+			//Entity Status
+		}
+		else if(!strcmp(packet_type, "Explosion"))
+		{
+			//Explosion
+		}
+		else if(!strcmp(packet_type, "Chunk Data"))
+		{
+			//Chunk Data
+		}
+		else if(!strcmp(packet_type, "Particle"))
+		{
+			//Particle
+		}
+		else if(!strcmp(packet_type, "Update Light"))
+		{
+			//Update Light
+		}
+		else if(!strcmp(packet_type, "Join Game"))
+		{
+			//Join Game
+		}
+		else if(!strcmp(packet_type, "Map Data"))
+		{
+			//Map Data
+		}
+		else if(!strcmp(packet_type, "Combat Event"))
+		{
+			//Combat Event
+		}
+		else if(!strcmp(packet_type, "Player Info"))
+		{
+			//Player Info
+		}
+		else if(!strcmp(packet_type, "Destroy Entities"))
+		{
+			//Destroy Entities
+		}
+		else if(!strcmp(packet_type, "Respawn"))
+		{
+			//Respawn
+		}
+		else if(!strcmp(packet_type, "Multi Block Change"))
+		{
+			//Multi Block Change
+		}
+		else if(!strcmp(packet_type, "World Border"))
+		{
+			//World Border
+		}
+		else if(!strcmp(packet_type, "Entity Metadata"))
+		{
+			//Entity Metadata
+		}
+		else if(!strcmp(packet_type, "Entity Equipment"))
+		{
+			//Entity Equipment
+		}
+		else if(!strcmp(packet_type, "Scoreboard Objective"))
+		{
+			//Scoreboard Objective
+		}
+		else if(!strcmp(packet_type, "Set Passengers"))
+		{
+			//Set Passengers
+		}
+		else if(!strcmp(packet_type, "Teams"))
+		{
+			//Teams
+		}
+		else if(!strcmp(packet_type, "Update Score"))
+		{
+			//Update Score
+		}
+		else if(!strcmp(packet_type, "Title"))
+		{
+			//Title
+		}
+		else if(!strcmp(packet_type, "Stop Sound"))
+		{
+			//Stop Sound
+		}
+		else if(!strcmp(packet_type, "NBT Query Response"))
+		{
+			//NBT Query Response
+		}
+		else if(!strcmp(packet_type, "Advancements"))
+		{
+			//Advancements
+		}
+		else if(!strcmp(packet_type, "Entity Properties"))
+		{
+			//Entity Properties
+		}
+		else if(!strcmp(packet_type, "Declare Recipes"))
+		{
+			//Declare Recipes
+		}
+		else if(!strcmp(packet_type, "Tags"))
+		{
+			//Tags
+		}
+		else
+		{
+			fprintf(stderr, "Unknown packet name.");
 		}
 	}
 
@@ -658,51 +861,65 @@ struct packet_t* construct_clientbound_packet(const char* packet_type, ...)
 	struct uuid_t uuid;
 	bool b;
 	str ch;
+	double d;
+	struct position_t p;
 
-	for (i = 0; i < current_slab->fields.size; i++)
+	for(i = 0; i < current_slab->fields.size; i++)
 	{
 		current_field = &current_slab->fields.fields[i];
 
-		switch (current_field->type)
+		switch(current_field->type)
 		{
-		case FT_VARINT:
-		case FT_INT:
+			case FT_VARINT:
+			case FT_INT:
 			num = va_arg(argp, i32);
+			map_set(packet->map, current_field->field_name, mv_i32(num));
 			break;
-		case FT_UNSIGNED_SHORT:
+			case FT_UNSIGNED_SHORT:
 			num = va_arg(argp, u16);
+			map_set(packet->map, current_field->field_name, mv_u16(num));
 			break;
-		case FT_UNSIGNED_BYTE:
+			case FT_UNSIGNED_BYTE:
+			case FT_ANGLE:
 			num = va_arg(argp, u8);
+			map_set(packet->map, current_field->field_name, mv_u8(num));
 			break;
-		case FT_ANGLE:
-			num = va_arg(argp, u8);
-			break;
-		case FT_BOOLEAN:
+			case FT_BOOLEAN:
 			b = va_arg(argp, bool);
+			map_set(packet->map, current_field->field_name, mv_i8(b));
 			break;
-		case FT_LONG:
-		case FT_VARLONG:
+			case FT_LONG:
+			case FT_VARLONG:
 			num = va_arg(argp, i64);
+			map_set(packet->map, current_field->field_name, mv_i64(num));
 			break;
-		case FT_UUID:
+			case FT_UUID:
 			uuid = va_arg(argp, struct uuid_t);
+			map_set(packet->map, current_field->field_name, mv_uuid(uuid));
 			break;
-		case FT_DOUBLE:
+			case FT_DOUBLE:
+			d = va_arg(argp, double);
+			map_set(packet->map, current_field->field_name, mv_double(d));
 			break;
-		case FT_SHORT:
+			case FT_SHORT:
+			num = va_arg(argp, i16);
+			map_set(packet->map, current_field->field_name, mv_i16(num));
 			break;
-		case FT_POSITION:
+			case FT_POSITION:
+			p = va_arg(argp, struct position_t);
+			map_set(packet->map, current_field->field_name, mv_pos(p));
 			break;
-		case FT_BYTE:
+			case FT_BYTE:
+			num = va_arg(argp, int8_t);
+			map_set(packet->map, current_field->field_name, mv_i8(num));
 			break;
-		case FT_FLOAT:
+			case FT_FLOAT:
 			break;
-		case FT_STRING:
+			case FT_STRING:
 			ch = va_arg(argp, str);
 			map_set(packet->map, current_field->field_name, mv_str(ch));
 			break;
-		default:
+			default:
 			break;
 		}
 
@@ -713,21 +930,27 @@ struct packet_t* construct_clientbound_packet(const char* packet_type, ...)
 
 	return packet;
 }
-void packet_free(struct packet_t* packet)
-{
 
+void packet_free(struct packet_t *packet)
+{
+	if(packet->map)
+	{
+		map_destroy(packet->map);
+	}
+	packet->map = 0;
+	free(packet);
 }
 buf make_varint(i32 varint)
 {
 	buf buf = buf_construct();
 	i32 i = 0;
-	while (true)
+	while(true)
 	{
-		if (i == 5)
+		if(i == 5)
 		{
 			break;
 		}
-		if ((varint & ~0x7f) == 0)
+		if((varint & ~0x7f) == 0)
 		{
 			buf_append(&buf, varint);
 			break;
@@ -802,14 +1025,14 @@ buf make_boolean(bool boolean)
 buf make_double(double d)
 {
 	buf buf = buf_construct();
-	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF00000000000000) >> 56));
-	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF000000000000) >> 48));
-	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF0000000000) >> 40));
-	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF00000000) >> 32));
-	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF000000) >> 24));
-	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF0000) >> 16));
-	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF00) >> 8));
-	buf_append(&buf, (u8) (((*(u64 *)&d) & 0xFF)));
+	buf_append(&buf, (u8) (((*(u64 *) &d) & 0xFF00000000000000) >> 56));
+	buf_append(&buf, (u8) (((*(u64 *) &d) & 0xFF000000000000) >> 48));
+	buf_append(&buf, (u8) (((*(u64 *) &d) & 0xFF0000000000) >> 40));
+	buf_append(&buf, (u8) (((*(u64 *) &d) & 0xFF00000000) >> 32));
+	buf_append(&buf, (u8) (((*(u64 *) &d) & 0xFF000000) >> 24));
+	buf_append(&buf, (u8) (((*(u64 *) &d) & 0xFF0000) >> 16));
+	buf_append(&buf, (u8) (((*(u64 *) &d) & 0xFF00) >> 8));
+	buf_append(&buf, (u8) (((*(u64 *) &d) & 0xFF)));
 	return buf;
 }
 buf make_angle(u8 angle)
@@ -840,9 +1063,9 @@ buf make_position(struct position_t pos)
 	pos.x &= 0x3ffffff;
 	pos.z &= 0x3ffffff;
 	pos.y &= 0xfff;
-	int_pos |= (i64)pos.x << (64 - 26);
-	int_pos |= (i64)pos.z << (64 - 26 - 26);
-	int_pos |= (i64)pos.y;
+	int_pos |= (i64) pos.x << (64 - 26);
+	int_pos |= (i64) pos.z << (64 - 26 - 26);
+	int_pos |= (i64) pos.y;
 	return make_i64(int_pos);
 }
 buf make_i8(i8 byte)
@@ -854,20 +1077,20 @@ buf make_i8(i8 byte)
 buf make_float(float f)
 {
 	i32 data;
-	data = *((i32*)&f);
+	data = *((i32 *) &f);
 	return make_i32(data);
 }
 buf make_string(str str)
 {
 	i32 i;
 	buf b = buf_construct();
-	char* cstr = str_cstr(str);
+	char *cstr = str_cstr(str);
 	buf varint_buf = make_varint(str.size);
 
 	buf_append_buf(&b, varint_buf);
-	
+
 	buf_destroy(&varint_buf);
-	for (i = 0; i < str.size; i++)
+	for(i = 0; i < str.size; i++)
 	{
 		buf_append(&b, str.data[i]);
 	}
@@ -877,15 +1100,15 @@ buf make_string(str str)
 buf make_varlong(i64 varlong)
 {
 	buf buf = buf_construct();
-	
+
 	size_t i = 0;
-	while (true)
+	while(true)
 	{
-		if (i == 10)
+		if(i == 10)
 		{
 			break;
 		}
-		if ((varlong & ~0x7f) == 0)
+		if((varlong & ~0x7f) == 0)
 		{
 			buf_append(&buf, (u8) varlong);
 			break;
@@ -896,17 +1119,17 @@ buf make_varlong(i64 varlong)
 		i++;
 	}
 
-	
-	
+
+
 	return buf;
 }
-void slurp_file_to_cstr(const char* file_name, char** cstr)
+void slurp_file_to_cstr(const char *file_name, char **cstr)
 {
-	FILE* fp = fopen(file_name, "r");
+	FILE *fp = fopen(file_name, "r");
 	i64 f_size;
 	i32 new_len;
 
-	if (!fp)
+	if(!fp)
 	{
 		*cstr = 0;
 		return;
@@ -916,7 +1139,7 @@ void slurp_file_to_cstr(const char* file_name, char** cstr)
 
 	f_size = ftell(fp);
 
-	if (f_size == -1)
+	if(f_size == -1)
 	{
 		*cstr = 0;
 		return;
@@ -928,7 +1151,7 @@ void slurp_file_to_cstr(const char* file_name, char** cstr)
 
 	new_len = fread(*cstr, sizeof(char), (size_t) f_size, fp);
 
-	if (!new_len)
+	if(!new_len)
 	{
 		*cstr = 0;
 		return;
@@ -938,3 +1161,113 @@ void slurp_file_to_cstr(const char* file_name, char** cstr)
 	fclose(fp);
 
 }
+
+
+
+bool create_sb_click_window(buf b, enum estate state, struct packet_t *packet)
+{
+	size_t data_needle = 0;
+	buf sliced;
+	data_needle += read_varint(b, 0);
+	sliced = buf_slice_from_buf(b, data_needle, b.size);
+	data_needle += read_varint(sliced, 0);
+
+	READY_SLICED_BUFFER();
+
+	u8 window_id;
+	data_needle += read_u8(sliced, &window_id);
+
+	READY_SLICED_BUFFER();
+
+	i16 slot;
+	data_needle += read_i16(sliced, &slot);
+
+	READY_SLICED_BUFFER();
+
+	i8 button;
+	data_needle += read_i8(sliced, &button);
+
+	READY_SLICED_BUFFER();
+
+	i16 action_number;
+	data_needle += read_i16(sliced, &action_number);
+
+	i32 mode;
+	data_needle += read_varint(sliced, &mode);
+
+	struct slot_t s;
+
+
+
+
+}
+bool create_sb_plugin_message(buf b, enum estate state, struct packet_t *packet)
+{
+	size_t data_needle = 0;
+	buf sliced;
+	data_needle += read_varint(b, 0);
+	sliced = buf_slice_from_buf(b, data_needle, b.size);
+	data_needle += read_varint(sliced, 0);
+
+	READY_SLICED_BUFFER();
+
+}
+bool create_sb_edit_book(buf b, enum estate state, struct packet_t *packet)
+{
+	size_t data_needle = 0;
+	buf sliced;
+	data_needle += read_varint(b, 0);
+	sliced = buf_slice_from_buf(b, data_needle, b.size);
+	data_needle += read_varint(sliced, 0);
+
+	READY_SLICED_BUFFER();
+
+}
+bool create_sb_interact_entity(buf b, enum estate state, struct packet_t *packet)
+{
+	size_t data_needle = 0;
+	buf sliced;
+	data_needle += read_varint(b, 0);
+	sliced = buf_slice_from_buf(b, data_needle, b.size);
+	data_needle += read_varint(sliced, 0);
+
+	READY_SLICED_BUFFER();
+
+}
+bool create_sb_player_digging(buf b, enum estate state, struct packet_t *packet)
+
+{
+	size_t data_needle = 0;
+	buf sliced;
+	data_needle += read_varint(b, 0);
+	sliced = buf_slice_from_buf(b, data_needle, b.size);
+	data_needle += read_varint(sliced, 0);
+
+	READY_SLICED_BUFFER();
+
+}
+bool create_sb_advancement_tab(buf b, enum estate state, struct packet_t *packet)
+{
+	size_t data_needle = 0;
+	buf sliced;
+	data_needle += read_varint(b, 0);
+	sliced = buf_slice_from_buf(b, data_needle, b.size);
+	data_needle += read_varint(sliced, 0);
+
+	READY_SLICED_BUFFER();
+}
+bool create_sb_creative_inventory_action(buf b, enum estate state, struct packet_t *packet)
+{
+	size_t data_needle = 0;
+	buf sliced;
+	data_needle += read_varint(b, 0);
+	sliced = buf_slice_from_buf(b, data_needle, b.size);
+	data_needle += read_varint(sliced, 0);
+
+	READY_SLICED_BUFFER();
+}
+
+
+
+
+

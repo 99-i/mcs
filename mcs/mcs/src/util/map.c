@@ -100,7 +100,7 @@ map_value mv_pos(struct position_t pos)
 {
 	return (map_value) {
 		.pos = pos,
-		.type = MAPTYPE_I8
+		.type = MAPTYPE_POSITION
 	};
 
 }

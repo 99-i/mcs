@@ -83,13 +83,14 @@ static void handle_read(uv_stream_t *stream, buf data, bool is_wraparound)
 	}
 
 
-	struct packet_t packet;
+	struct packet_t *packet = mcsalloc(sizeof(struct packet_t));
 
-	res = create_serverbound_packet(data, client->state, &packet);
+	res = create_serverbound_packet(data, client->state, packet);
 
 	if (res)
 	{
-		game_handle_client_packet(client, &packet);
+		game_handle_client_packet(client, packet);
+		packet_free(packet);
 	}
 	
 	if (!is_wraparound)
@@ -106,6 +107,10 @@ static void read_stream(uv_stream_t *stream, ssize_t nread, const uv_buf_t *read
 		if (nread == UV_EOF)
 		{
 			game_handle_client_disconnect((uv_tcp_t*) stream);
+			if(readbuf->base)
+			{
+				mcsfree(readbuf->base);
+			}
 			return;
 		}
 	}

@@ -34,4 +34,10 @@ int main()
 	return 0;
 }
 
+int main2()
+{
+	client_array g = client_array_construct(0);
+
+
+}
 
