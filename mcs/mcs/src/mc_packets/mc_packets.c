@@ -8,6 +8,7 @@
 #include <assert.h>
 #include "mcs.h"
 #include "util/buf.h"
+#include "slot.h"
 #include "uuid.h"
 #include "types.h"
 

@@ -371,7 +371,7 @@ static void sb_handle_request(struct client_t *client, struct packet_t *packet)
 				\"online\": 5 \
 			}, \
 			\"description\": { \
-				\"text\": \"Hello world\" \
+				\"text\": \"asdfasdfasdf\" \
 			} \
 		}";
 	str s = str_construct_from_cstr(i);
