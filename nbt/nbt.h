@@ -23,9 +23,14 @@ struct nbt_tag;
 struct nbt_byte_array
 {
 	int32_t size;
-	struct nbt_tag *bytes;
+	int8_t *bytes;
 };
 
+struct nbt_string
+{
+	uint16_t size;
+	wchar_t *str;
+};
 struct nbt_list
 {
 	nbt_tag_type type;
@@ -51,7 +56,6 @@ struct nbt_long_array
 struct nbt_tag
 {
 	nbt_tag_type type;
-	bool has_name;
 	char *name;
 	union
 	{
@@ -62,7 +66,7 @@ struct nbt_tag
 		float					tag_float;
 		double					tag_double;
 		struct nbt_byte_array	tag_byte_array;
-		char*					tag_string;
+		struct nbt_string		tag_string;
 		struct nbt_list			tag_list;
 		struct npt_compound		tag_compound;
 		struct nbt_int_array	tag_int_array;

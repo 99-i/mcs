@@ -633,6 +633,10 @@ static i32 read_float(buf b, float *dest)
 
 	return 4;
 }
+
+/* major flaw : this is supposed to be a utf - 8 reader,
+*  but it only reads ascii for now
+*/
 static i32 read_str(buf b, str *dest)
 {
 	i32 strlength;
@@ -1146,7 +1150,7 @@ void slurp_file_to_cstr(const char *file_name, char **cstr)
 		return;
 	}
 
-	*cstr = mcsalloc(sizeof(char) * ((i32) f_size + 1));
+	*cstr = mcsalloc(sizeof(char) * ((u64) f_size + 1));
 
 	fseek(fp, 0, SEEK_SET);
 
@@ -1193,13 +1197,14 @@ bool create_sb_click_window(buf b, enum estate state, struct packet_t *packet)
 	i16 action_number;
 	data_needle += read_i16(sliced, &action_number);
 
+	READY_SLICED_BUFFER();
+
 	i32 mode;
 	data_needle += read_varint(sliced, &mode);
 
 	struct slot_t s;
 
-
-
+	UNIMPLEMENTED;
 
 }
 bool create_sb_plugin_message(buf b, enum estate state, struct packet_t *packet)
@@ -1212,6 +1217,7 @@ bool create_sb_plugin_message(buf b, enum estate state, struct packet_t *packet)
 
 	READY_SLICED_BUFFER();
 
+	UNIMPLEMENTED;
 }
 bool create_sb_edit_book(buf b, enum estate state, struct packet_t *packet)
 {
@@ -1223,6 +1229,7 @@ bool create_sb_edit_book(buf b, enum estate state, struct packet_t *packet)
 
 	READY_SLICED_BUFFER();
 
+	UNIMPLEMENTED;
 }
 bool create_sb_interact_entity(buf b, enum estate state, struct packet_t *packet)
 {
@@ -1234,6 +1241,7 @@ bool create_sb_interact_entity(buf b, enum estate state, struct packet_t *packet
 
 	READY_SLICED_BUFFER();
 
+	UNIMPLEMENTED;
 }
 bool create_sb_player_digging(buf b, enum estate state, struct packet_t *packet)
 
@@ -1246,6 +1254,7 @@ bool create_sb_player_digging(buf b, enum estate state, struct packet_t *packet)
 
 	READY_SLICED_BUFFER();
 
+	UNIMPLEMENTED;
 }
 bool create_sb_advancement_tab(buf b, enum estate state, struct packet_t *packet)
 {
@@ -1256,6 +1265,7 @@ bool create_sb_advancement_tab(buf b, enum estate state, struct packet_t *packet
 	data_needle += read_varint(sliced, 0);
 
 	READY_SLICED_BUFFER();
+	UNIMPLEMENTED;
 }
 bool create_sb_creative_inventory_action(buf b, enum estate state, struct packet_t *packet)
 {
@@ -1266,6 +1276,7 @@ bool create_sb_creative_inventory_action(buf b, enum estate state, struct packet
 	data_needle += read_varint(sliced, 0);
 
 	READY_SLICED_BUFFER();
+	UNIMPLEMENTED;
 }
 
 
