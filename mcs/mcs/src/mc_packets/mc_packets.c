@@ -1276,6 +1276,7 @@ bool create_sb_creative_inventory_action(buf b, enum estate state, struct packet
 	data_needle += read_varint(sliced, 0);
 
 	READY_SLICED_BUFFER();
+
 	UNIMPLEMENTED;
 }
 
